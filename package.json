@@ -81,9 +81,9 @@
   "scripts": {
     "build": "grunt build",
     "dev": "grunt watch",
-    "test": "grunt && bin/qunit.js test/cli/*.js",
+    "test": "grunt && node bin/qunit.js test/cli/*.js",
     "test:main": "grunt",
-    "test:cli": "grunt build && bin/qunit.js test/cli/*.js",
+    "test:cli": "grunt build && node bin/qunit.js test/cli/*.js",
     "coverage": "grunt coverage"
   },
   "commitplease": {
