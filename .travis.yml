@@ -1,7 +1,3 @@
-language: node_js
-
-node_js: "10"
-
-script:
-- npm install spider.js@arschmitz/spider.js#master
-- node_modules/spider.js/bin/spider.js --url=https://api.qunitjs.com
+language: python
+python: "3.8"
+script: python3 hydra.py "https://api.qunitjs.com"
