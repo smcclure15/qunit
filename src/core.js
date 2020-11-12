@@ -30,6 +30,7 @@ config.currentModule.suiteReport = globalSuite;
 
 var globalStartCalled = false;
 var runStarted = false;
+var readyToBegin = false;
 
 // Figure out if we're running the tests from a server or not
 QUnit.isLocal = ( window && window.location && window.location.protocol === "file:" );
@@ -58,6 +59,7 @@ extend( QUnit, {
 		var globalStartAlreadyCalled = globalStartCalled;
 		globalStartCalled = true;
 
+		// guard against any invalid re-entries
 		if ( runStarted ) {
 			throw new Error( "Called start() while test already started running" );
 		}
@@ -69,19 +71,19 @@ extend( QUnit, {
 				"QUnit.config.autostart was true" );
 		}
 
-		if ( config.pageLoaded ) {
+		if ( readyToBegin ) {
 			scheduleBegin();
-		} else {
+			return;
+		}
 
-			// The page isn't completely loaded yet, so we set autostart and then
-			// load if we're in Node or wait for the browser's load event.
-			config.autostart = true;
+		// The page isn't completely loaded yet, so we set autostart and then
+		// load if we're in Node or wait for the browser's load event.
+		config.autostart = true;
 
-			// Starts from Node even if .load was not previously called. We still return
-			// early otherwise we'll wind up "beginning" twice.
-			if ( !document ) {
-				QUnit.load();
-			}
+		// Starts from Node even if .load was not previously called. We still return
+		// early otherwise we'll wind up "beginning" twice.
+		if ( !document ) {
+			QUnit.load();
 		}
 	},
 
@@ -100,7 +102,12 @@ extend( QUnit, {
 	},
 
 	load: function() {
-		config.pageLoaded = true;
+		if ( readyToBegin ) {
+
+			// re-entry, do nothing
+			return;
+		}
+		readyToBegin = true;
 
 		// Initialize the configuration options
 		extend( config, {
@@ -111,12 +118,10 @@ extend( QUnit, {
 			filter: ""
 		}, true );
 
-		if ( !runStarted ) {
-			config.blocking = false;
+		config.blocking = false;
 
-			if ( config.autostart ) {
-				scheduleBegin();
-			}
+		if ( config.autostart ) {
+			scheduleBegin();
 		}
 	},
 
