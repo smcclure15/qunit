@@ -50,37 +50,39 @@ extend( QUnit, {
 	only: test.only,
 
 	start: function( count ) {
-		var globalStartAlreadyCalled = globalStartCalled;
 
-		if ( !config.current ) {
-			globalStartCalled = true;
-
-			if ( runStarted ) {
-				throw new Error( "Called start() while test already started running" );
-			} else if ( globalStartAlreadyCalled || count > 1 ) {
-				throw new Error( "Called start() outside of a test context too many times" );
-			} else if ( config.autostart ) {
-				throw new Error( "Called start() outside of a test context when " +
-					"QUnit.config.autostart was true" );
-			} else if ( !config.pageLoaded ) {
-
-				// The page isn't completely loaded yet, so we set autostart and then
-				// load if we're in Node or wait for the browser's load event.
-				config.autostart = true;
-
-				// Starts from Node even if .load was not previously called. We still return
-				// early otherwise we'll wind up "beginning" twice.
-				if ( !document ) {
-					QUnit.load();
-				}
-
-				return;
-			}
-		} else {
+		if ( config.current ) {
 			throw new Error( "QUnit.start cannot be called inside a test context." );
 		}
 
-		scheduleBegin();
+		var globalStartAlreadyCalled = globalStartCalled;
+		globalStartCalled = true;
+
+		if ( runStarted ) {
+			throw new Error( "Called start() while test already started running" );
+		}
+		if ( globalStartAlreadyCalled || count > 1 ) {
+			throw new Error( "Called start() outside of a test context too many times" );
+		}
+		if ( config.autostart ) {
+			throw new Error( "Called start() outside of a test context when " +
+				"QUnit.config.autostart was true" );
+		}
+
+		if ( config.pageLoaded ) {
+			scheduleBegin();
+		} else {
+
+			// The page isn't completely loaded yet, so we set autostart and then
+			// load if we're in Node or wait for the browser's load event.
+			config.autostart = true;
+
+			// Starts from Node even if .load was not previously called. We still return
+			// early otherwise we'll wind up "beginning" twice.
+			if ( !document ) {
+				QUnit.load();
+			}
+		}
 	},
 
 	config: config,
