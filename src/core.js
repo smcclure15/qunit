@@ -28,15 +28,89 @@ export const globalSuite = new SuiteReport();
 // it since each module has a suiteReport associated with it.
 config.currentModule.suiteReport = globalSuite;
 
-var globalStartCalled = false;
-var runStarted = false;
-var readyToBegin = false;
-
 // Figure out if we're running the tests from a server or not
 QUnit.isLocal = ( window && window.location && window.location.protocol === "file:" );
 
 // Expose the current QUnit version
 QUnit.version = "@VERSION";
+
+
+var StateMachine = {
+	Uninitialized: class {
+		start() {
+			if ( config.autostart ) {
+				currentStartState = new StateMachine.StartFailed();
+				throw new Error( "Called start() outside of a test context when " +
+					"QUnit.config.autostart was true" );
+			}
+			config.autostart = true;
+		}
+		load() {
+
+			// Initialize the configuration options
+			extend( config, {
+				stats: { all: 0, bad: 0, testCount: 0 },
+				started: 0,
+				updateRate: 1000,
+				autostart: true,
+				filter: ""
+			}, true );
+
+			config.blocking = false;
+
+			currentStartState = new StateMachine.OkToStart();
+
+			// start immediately if possible
+			if ( config.autostart ) {
+
+				// start immediately
+				currentStartState.start();
+			}
+		}
+	},
+	Initialized: class {
+		load() {} // no-op
+	}
+};
+extend( StateMachine, {
+	UninitializedInNode: class extends StateMachine.Uninitialized {
+		start() {
+			super.start();
+
+			// load immediately
+			this.load();
+		}
+	},
+	UninitializedInBrowser: class extends StateMachine.Uninitialized {
+		start() {
+			super.start();
+
+			// mark OK and wait for browser load event to trigger
+			currentStartState = new StateMachine.OkToStart();
+		}
+	},
+	StartFailed: class extends StateMachine.Uninitialized {
+		start() {
+			throw new Error( "Called start() outside of a test context too many times" );
+		}
+
+		// load can still recover
+	},
+	OkToStart: class extends StateMachine.Initialized {
+		start() {
+			scheduleBegin();
+			currentStartState = new StateMachine.RunStarted();
+		}
+	},
+	RunStarted: class extends StateMachine.Initialized {
+		start() {
+			throw new Error( "Called start() while test already started running" );
+		}
+	}
+} );
+
+var currentStartState = document ?
+	new StateMachine.UninitializedInBrowser() : new StateMachine.UninitializedInNode();
 
 extend( QUnit, {
 	on,
@@ -50,41 +124,13 @@ extend( QUnit, {
 	skip: test.skip,
 	only: test.only,
 
-	start: function( count ) {
+	start: function() {
 
 		if ( config.current ) {
 			throw new Error( "QUnit.start cannot be called inside a test context." );
 		}
 
-		var globalStartAlreadyCalled = globalStartCalled;
-		globalStartCalled = true;
-
-		// guard against any invalid re-entries
-		if ( runStarted ) {
-			throw new Error( "Called start() while test already started running" );
-		}
-		if ( globalStartAlreadyCalled || count > 1 ) {
-			throw new Error( "Called start() outside of a test context too many times" );
-		}
-		if ( config.autostart ) {
-			throw new Error( "Called start() outside of a test context when " +
-				"QUnit.config.autostart was true" );
-		}
-
-		if ( readyToBegin ) {
-			scheduleBegin();
-			return;
-		}
-
-		// The page isn't completely loaded yet, so we set autostart and then
-		// load if we're in Node or wait for the browser's load event.
-		config.autostart = true;
-
-		// Starts from Node even if .load was not previously called. We still return
-		// early otherwise we'll wind up "beginning" twice.
-		if ( !document ) {
-			QUnit.load();
-		}
+		currentStartState.start();
 	},
 
 	config: config,
@@ -102,27 +148,7 @@ extend( QUnit, {
 	},
 
 	load: function() {
-		if ( readyToBegin ) {
-
-			// re-entry, do nothing
-			return;
-		}
-		readyToBegin = true;
-
-		// Initialize the configuration options
-		extend( config, {
-			stats: { all: 0, bad: 0, testCount: 0 },
-			started: 0,
-			updateRate: 1000,
-			autostart: true,
-			filter: ""
-		}, true );
-
-		config.blocking = false;
-
-		if ( config.autostart ) {
-			scheduleBegin();
-		}
+		currentStartState.load();
 	},
 
 	stack: function( offset ) {
@@ -143,8 +169,6 @@ QUnit.dump = dump;
 registerLoggingCallbacks( QUnit );
 
 function scheduleBegin() {
-
-	runStarted = true;
 
 	// Add a slight delay to allow definition of more modules and tests.
 	if ( setTimeout ) {
