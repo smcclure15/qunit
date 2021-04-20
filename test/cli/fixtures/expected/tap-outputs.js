@@ -96,19 +96,18 @@ ok 5 A-Test > derp
 # fail 0`,
 
 	"qunit --reporter npm-reporter": "Run ended!",
+
 	"qunit --reporter does-not-exist": `No reporter found matching "does-not-exist".
 Built-in reporters: console, tap
-Extra reporters found among package dependencies: npm-reporter
-`,
+Extra reporters found among package dependencies: npm-reporter`,
 
 	"qunit --reporter": `Built-in reporters: console, tap
-Extra reporters found among package dependencies: npm-reporter
-`,
+Extra reporters found among package dependencies: npm-reporter`,
 
 	/* eslint-disable max-len */
 	"qunit hanging-test": `Error: Process exited before tests finished running
-Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.
-`,
+Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.`,
+
 	/* eslint-enable max-len */
 	"qunit unhandled-rejection.js":
 `TAP version 13

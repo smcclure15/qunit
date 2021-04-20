@@ -52,6 +52,7 @@ module.exports = async function execute( command, execaOptions, hook ) {
 		return result;
 	} catch ( e ) {
 		e.stdout = normalize( String( e.stdout ).trimEnd() );
+		e.stderr = normalize( String( e.stderr ).trimEnd() );
 		throw e;
 	}
 };
