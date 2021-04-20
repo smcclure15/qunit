@@ -152,8 +152,7 @@ Unhandled Rejection: {
     at advanceTestQueue (/qunit/qunit/qunit.js)
     at Object.advance (/qunit/qunit/qunit.js)
     at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-    at internal
-Error: Process exited before tests finished running`
+    at internal`
 	},
 
 	"qunit sourcemap/source.js":
@@ -236,8 +235,7 @@ ok 1 Zero assertions > has a test
     at advanceTestQueue (/qunit/qunit/qunit.js)
     at Object.advance (/qunit/qunit/qunit.js)
     at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-    at internal
-Error: Process exited before tests finished running`
+    at internal`
 	},
 
 	"qunit single.js --require require-dep --require './node_modules/require-dep/module.js'":
