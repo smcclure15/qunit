@@ -140,6 +140,43 @@ Unhandled Rejection: {
 }`
 	},
 
+	"qunit error-in-begin-callback.js": {
+		"stdout": "TAP version 13",
+		"stderr":
+`Unhandled Rejection: Error: Error in Begin
+    at /qunit/test/cli/fixtures/error-in-begin-callback.js:2:8
+    at /qunit/qunit/qunit.js:1756:40
+    at internal`
+	},
+
+	"qunit error-in-testDone-callback.js": {
+		"stdout":
+`TAP version 13
+ok 1 Test A`,
+		"stderr":
+`Unhandled Rejection: Error: Error in testDone
+    at /qunit/test/cli/fixtures/error-in-testDone-callback.js:2:8
+    at /qunit/qunit/qunit.js:1756:40
+    at internal
+Error: Process exited before tests finished running`
+	},
+
+	"qunit error-in-done-callback.js": {
+		"stdout":
+`TAP version 13
+ok 1 Test A
+1..1
+# pass 1
+# skip 0
+# todo 0
+# fail 0`,
+		"stderr":
+`Unhandled Rejection: Error: Error in Done
+    at /qunit/test/cli/fixtures/error-in-done-callback.js:2:8
+    at /qunit/qunit/qunit.js:1756:40
+    at internal`
+	},
+
 	// The last frame differs between Node 10 and 12+ (changes in processing of ticks)
 	"qunit no-tests": {
 		"stdout": "TAP version 13",

@@ -49,6 +49,7 @@ module.exports = async function execute( command, execaOptions, hook ) {
 	try {
 		const result = await execution;
 		result.stdout = normalize( String( result.stdout ).trimEnd() );
+		result.stderr = normalize( String( result.stderr ).trimEnd() );
 		return result;
 	} catch ( e ) {
 		e.stdout = normalize( String( e.stdout ).trimEnd() );

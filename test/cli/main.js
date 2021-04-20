@@ -133,6 +133,42 @@ QUnit.module( "CLI Main", () => {
 		}
 	} );
 
+	QUnit.module( "errors in callbacks", () => {
+
+		QUnit.test( "error in QUnit.begin", async assert => {
+			const command = "qunit error-in-begin-callback.js";
+
+			try {
+				await execute( command );
+			} catch ( e ) {
+				assert.equal( e.code, 1 );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
+			}
+		} );
+
+		QUnit.test( "error in QUnit.testDone", async assert => {
+			const command = "qunit error-in-testDone-callback.js";
+
+			try {
+				await execute( command );
+			} catch ( e ) {
+				assert.equal( e.code, 1 );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
+			}
+		} );
+
+		QUnit.test( "error in QUnit.done", async assert => {
+			const command = "qunit error-in-done-callback.js";
+
+			const result = await execute( command );
+
+			assert.equal( result.stderr, expectedOutput[ command ].stderr );
+			assert.equal( result.stdout, expectedOutput[ command ].stdout );
+		} );
+	} );
+
 	if ( semver.gte( process.versions.node, "12.0.0" ) ) {
 		QUnit.test( "run ESM test suite with import statement", async assert => {
 			const command = "qunit ../../es2018/esm.mjs";
