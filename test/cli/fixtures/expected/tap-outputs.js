@@ -116,10 +116,7 @@ not ok 1 Unhandled Rejections > test passes just fine, but has a rejected promis
   ---
   message: Error thrown in non-returned promise!
   severity: failed
-  actual  : {
-  "message": "Error thrown in non-returned promise!",
-  "stack": "Error: Error thrown in non-returned promise!\\n    at /some/path/wherever/unhandled-rejection.js:13:11"
-}
+  actual  : null
   expected: undefined
   stack: |
     Error: Error thrown in non-returned promise!
