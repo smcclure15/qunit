@@ -103,10 +103,12 @@ async function run( args, options ) {
 
 	// Listen for unhandled rejections, and call QUnit.onUnhandledRejection
 	process.on( "unhandledRejection", function( reason ) {
+		console.error( "Unhandled Rejection:", reason );
 		QUnit.onUnhandledRejection( reason );
 	} );
 
 	process.on( "uncaughtException", function( error ) {
+		console.error( "Uncaught Exception:", error );
 		QUnit.onError( error );
 	} );
 

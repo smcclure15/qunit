@@ -102,8 +102,8 @@ QUnit.module( "CLI Main", () => {
 			await execute( command );
 		} catch ( e ) {
 			assert.equal( e.code, 1 );
-			assert.equal( e.stderr, "" );
-			assert.equal( e.stdout, expectedOutput[ command ] );
+			assert.equal( e.stderr, expectedOutput[ command ].stderr );
+			assert.equal( e.stdout, expectedOutput[ command ].stdout );
 		}
 	} );
 
@@ -128,8 +128,8 @@ QUnit.module( "CLI Main", () => {
 			} );
 		} catch ( e ) {
 			assert.equal( e.code, 1 );
-			assert.equal( e.stderr, "" );
-			assert.equal( e.stdout, expectedOutput[ command ] );
+			assert.equal( e.stderr, expectedOutput[ command ].stderr );
+			assert.equal( e.stdout, expectedOutput[ command ].stdout );
 		}
 	} );
 
@@ -228,8 +228,8 @@ QUnit.module( "CLI Main", () => {
 				await execute( command );
 			} catch ( e ) {
 				assert.equal( e.code, 1 );
-				assert.equal( e.stderr, "" );
-				assert.equal( e.stdout, expectedOutput[ command ] );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
 			}
 		} );
 	} );
@@ -290,8 +290,8 @@ QUnit.module( "CLI Main", () => {
 				await execute( command );
 			} catch ( e ) {
 				assert.equal( e.code, 1 );
-				assert.equal( e.stderr, "" );
-				assert.equal( e.stdout, expectedOutput[ command ] );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
 			}
 		} );
 
