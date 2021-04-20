@@ -125,24 +125,11 @@ not ok 1 Unhandled Rejections > test passes just fine, but has a rejected promis
     Error: Error thrown in non-returned promise!
         at /some/path/wherever/unhandled-rejection.js:13:11
   ...
-not ok 2 global failure
-  ---
-  message: outside of a test context
-  severity: failed
-  actual  : {
-  "message": "outside of a test context",
-  "stack": "Error: outside of a test context\\n    at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)"
-}
-  expected: undefined
-  stack: |
-    Error: outside of a test context
-        at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)
-  ...
-1..2
+1..1
 # pass 0
 # skip 0
 # todo 0
-# fail 2`,
+# fail 1`,
 		"stderr":
 `Unhandled Rejection: {
   message: 'outside of a test context',
@@ -158,34 +145,15 @@ Unhandled Rejection: {
 
 	// The last frame differs between Node 10 and 12+ (changes in processing of ticks)
 	"qunit no-tests": {
-		"stdout":
-`TAP version 13
-not ok 1 global failure
-  ---
-  message: No tests were run.
-  severity: failed
-  actual  : {}
-  expected: undefined
-  stack: |
-    Error: No tests were run.
-        at done (/qunit/qunit/qunit.js)
-        at advanceTestQueue (/qunit/qunit/qunit.js)
-        at Object.advance (/qunit/qunit/qunit.js)
-        at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-        at internal
-  ...
-1..1
-# pass 0
-# skip 0
-# todo 0
-# fail 1`,
+		"stdout": "TAP version 13",
 		"stderr":
 `Unhandled Rejection: Error: No tests were run.
     at done (/qunit/qunit/qunit.js)
     at advanceTestQueue (/qunit/qunit/qunit.js)
     at Object.advance (/qunit/qunit/qunit.js)
     at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-    at internal`
+    at internal
+Error: Process exited before tests finished running`
 	},
 
 	"qunit sourcemap/source.js":
@@ -261,34 +229,15 @@ ok 1 Zero assertions > has a test
 # fail 0`,
 
 	"qunit qunit --filter 'no matches' test": {
-		"stdout":
-`TAP version 13
-not ok 1 global failure
-  ---
-  message: "No tests matched the filter \\"no matches\\"."
-  severity: failed
-  actual  : {}
-  expected: undefined
-  stack: |
-    Error: No tests matched the filter "no matches".
-        at done (/qunit/qunit/qunit.js)
-        at advanceTestQueue (/qunit/qunit/qunit.js)
-        at Object.advance (/qunit/qunit/qunit.js)
-        at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-        at internal
-  ...
-1..1
-# pass 0
-# skip 0
-# todo 0
-# fail 1`,
+		"stdout": "TAP version 13",
 		"stderr":
 `Unhandled Rejection: Error: No tests matched the filter "no matches".
     at done (/qunit/qunit/qunit.js)
     at advanceTestQueue (/qunit/qunit/qunit.js)
     at Object.advance (/qunit/qunit/qunit.js)
     at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-    at internal`
+    at internal
+Error: Process exited before tests finished running`
 	},
 
 	"qunit single.js --require require-dep --require './node_modules/require-dep/module.js'":

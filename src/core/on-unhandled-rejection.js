@@ -1,7 +1,5 @@
-import { test } from "../test";
 
 import config from "./config";
-import { extend } from "./utilities";
 import { sourceFromStacktrace } from "./stacktrace";
 
 // Handle an unhandled rejection
@@ -16,10 +14,8 @@ export default function onUnhandledRejection( reason ) {
 	const currentTest = config.current;
 	if ( currentTest ) {
 		currentTest.assert.pushResult( resultInfo );
-	} else {
-		test( "global failure", extend( function( assert ) {
-			assert.pushResult( resultInfo );
-		}, { validTest: true } ) );
 	}
+
+	// otherwise let the underlying process handle it
 }
 
