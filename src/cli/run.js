@@ -103,11 +103,35 @@ async function run( args, options ) {
 
 	// Listen for unhandled rejections, and call QUnit.onUnhandledRejection
 	process.on( "unhandledRejection", function( reason ) {
-		QUnit.onUnhandledRejection( reason );
+
+		// these could occur even after "runEnd" (for instance, in QUnit.done)
+		process.exitCode = 1;
+
+		// always stream to stderr
+		console.error( reason );
+
+		// produce the failure if we're in a test, otherwise, the process will handle it
+		// more cleanly than injecting a "global failure".
+		const currentTest = QUnit.config.current;
+		if ( currentTest ) {
+			QUnit.onUnhandledRejection( reason );
+		}
 	} );
 
 	process.on( "uncaughtException", function( error ) {
-		QUnit.onError( error );
+
+		// these could occur even after "runEnd" (for instance, in QUnit.done)
+		process.exitCode = 1;
+
+		// always stream to stderr
+		console.error( error );
+
+		// produce the failure if we're in a test, otherwise, the process will handle it
+		// more cleanly than injecting a "global failure".
+		const currentTest = QUnit.config.current;
+		if ( currentTest ) {
+			QUnit.onError( error );
+		}
 	} );
 
 	process.on( "exit", function() {

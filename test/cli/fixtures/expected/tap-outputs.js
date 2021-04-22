@@ -107,7 +107,8 @@ Extra reporters found among package dependencies: npm-reporter`,
 	"qunit hanging-test": `Error: Process exited before tests finished running
 Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.`,
 	/* eslint-enable max-len */
-	"qunit unhandled-rejection.js":
+	"qunit unhandled-rejection.js": {
+		"stdout":
 `TAP version 13
 not ok 1 Unhandled Rejections > test passes just fine, but has a rejected promise
   ---
@@ -122,38 +123,48 @@ not ok 1 Unhandled Rejections > test passes just fine, but has a rejected promis
     Error: Error thrown in non-returned promise!
         at /some/path/wherever/unhandled-rejection.js:13:11
   ...
-not ok 2 global failure
-  ---
-  message: outside of a test context
-  severity: failed
-  actual  : {
-  "message": "outside of a test context",
-  "stack": "Error: outside of a test context\\n    at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)"
-}
-  expected: undefined
-  stack: |
-    Error: outside of a test context
-        at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)
-  ...
-1..2
+1..1
 # pass 0
 # skip 0
 # todo 0
-# fail 2`,
+# fail 1`,
+		"stderr":
+`{
+  message: 'outside of a test context',
+  stack: 'Error: outside of a test context\\n' +
+    '    at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)'
+}
+{
+  message: 'Error thrown in non-returned promise!',
+  stack: 'Error: Error thrown in non-returned promise!\\n' +
+    '    at /some/path/wherever/unhandled-rejection.js:13:11'
+}`
+	},
 
 	"qunit error-in-begin-callback.js": {
 		"stdout": "TAP version 13",
-		"stderr": "Error: Process exited before tests finished running"
+		"stderr":
+`Error: Error in Begin
+    at /qunit/test/cli/fixtures/error-in-begin-callback.js:2:8
+    at /qunit/qunit/qunit.js
+    at internal
+Error: Process exited before tests finished running`
 	},
 
 	"qunit error-in-testDone-callback.js": {
 		"stdout":
 `TAP version 13
 ok 1 Test A`,
-		"stderr": "Error: Process exited before tests finished running"
+		"stderr":
+`Error: Error in testDone
+    at /qunit/test/cli/fixtures/error-in-testDone-callback.js:2:8
+    at /qunit/qunit/qunit.js
+    at internal
+Error: Process exited before tests finished running`
 	},
 
-	"qunit error-in-done-callback.js":
+	"qunit error-in-done-callback.js": {
+		"stdout":
 `TAP version 13
 ok 1 Test A
 1..1
@@ -161,29 +172,25 @@ ok 1 Test A
 # skip 0
 # todo 0
 # fail 0`,
+		"stderr":
+`Error: Error in Done
+    at /qunit/test/cli/fixtures/error-in-done-callback.js:2:8
+    at /qunit/qunit/qunit.js
+    at internal`
+	},
 
 	// The last frame differs between Node 10 and 12+ (changes in processing of ticks)
-	"qunit no-tests":
-`TAP version 13
-not ok 1 global failure
-  ---
-  message: No tests were run.
-  severity: failed
-  actual  : {}
-  expected: undefined
-  stack: |
-    Error: No tests were run.
-        at done (/qunit/qunit/qunit.js)
-        at advanceTestQueue (/qunit/qunit/qunit.js)
-        at Object.advance (/qunit/qunit/qunit.js)
-        at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-        at internal
-  ...
-1..1
-# pass 0
-# skip 0
-# todo 0
-# fail 1`,
+	"qunit no-tests": {
+		"stdout": "TAP version 13",
+		"stderr":
+`Error: No tests were run.
+    at done (/qunit/qunit/qunit.js)
+    at advanceTestQueue (/qunit/qunit/qunit.js)
+    at Object.advance (/qunit/qunit/qunit.js)
+    at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
+    at internal
+Error: Process exited before tests finished running`
+	},
 
 	"qunit sourcemap/source.js":
 `TAP version 13
@@ -257,27 +264,17 @@ ok 1 Zero assertions > has a test
 # todo 0
 # fail 0`,
 
-	"qunit qunit --filter 'no matches' test":
-`TAP version 13
-not ok 1 global failure
-  ---
-  message: "No tests matched the filter \\"no matches\\"."
-  severity: failed
-  actual  : {}
-  expected: undefined
-  stack: |
-    Error: No tests matched the filter "no matches".
-        at done (/qunit/qunit/qunit.js)
-        at advanceTestQueue (/qunit/qunit/qunit.js)
-        at Object.advance (/qunit/qunit/qunit.js)
-        at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
-        at internal
-  ...
-1..1
-# pass 0
-# skip 0
-# todo 0
-# fail 1`,
+	"qunit qunit --filter 'no matches' test": {
+		"stdout": "TAP version 13",
+		"stderr":
+`Error: No tests matched the filter "no matches".
+    at done (/qunit/qunit/qunit.js)
+    at advanceTestQueue (/qunit/qunit/qunit.js)
+    at Object.advance (/qunit/qunit/qunit.js)
+    at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
+    at internal
+Error: Process exited before tests finished running`
+	},
 
 	"qunit single.js --require require-dep --require './node_modules/require-dep/module.js'":
 `required require-dep/index.js
@@ -360,7 +357,8 @@ ok 1 module providing hooks > module not providing hooks > has a test
 # todo 0
 # fail 0`,
 
-	"qunit done-after-timeout.js":
+	"qunit done-after-timeout.js": {
+		"stdout":
 `TAP version 13
 not ok 1 times out before scheduled done is called
   ---
@@ -375,5 +373,10 @@ not ok 1 times out before scheduled done is called
 # pass 0
 # skip 0
 # todo 0
-# fail 1`
+# fail 1`,
+		"stderr":
+`Error: assert.async callback called after test finished.
+    at Timeout.done [as _onTimeout] (/qunit/qunit/qunit.js)
+    at internal`
+	}
 };

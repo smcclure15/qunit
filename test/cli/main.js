@@ -102,8 +102,8 @@ QUnit.module( "CLI Main", () => {
 			await execute( command );
 		} catch ( e ) {
 			assert.equal( e.code, 1 );
-			assert.equal( e.stderr, "" );
-			assert.equal( e.stdout, expectedOutput[ command ] );
+			assert.equal( e.stderr, expectedOutput[ command ].stderr );
+			assert.equal( e.stdout, expectedOutput[ command ].stdout );
 		}
 	} );
 
@@ -128,8 +128,8 @@ QUnit.module( "CLI Main", () => {
 			} );
 		} catch ( e ) {
 			assert.equal( e.code, 1 );
-			assert.equal( e.stderr, "" );
-			assert.equal( e.stdout, expectedOutput[ command ] );
+			assert.equal( e.stdout, expectedOutput[ command ].stdout );
+			assert.equal( e.stderr, expectedOutput[ command ].stderr );
 		}
 	} );
 
@@ -165,12 +165,9 @@ QUnit.module( "CLI Main", () => {
 			try {
 				await execute( command );
 			} catch ( e ) {
-				assert.equal( e.stdout, expectedOutput[ command ] );
-
-				// These are actually undesirable, but the verification help document
-				// current behavior. TDD should break these and correct them.
-				assert.equal( e.code, 7 );
-				assert.true( e.stderr.includes( "TypeError: Cannot read property 'length' of undefined" ), e.stderr );
+				assert.equal( e.code, 1 );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
 			}
 		} );
 	} );
@@ -270,8 +267,8 @@ QUnit.module( "CLI Main", () => {
 				await execute( command );
 			} catch ( e ) {
 				assert.equal( e.code, 1 );
-				assert.equal( e.stderr, "" );
-				assert.equal( e.stdout, expectedOutput[ command ] );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
 			}
 		} );
 	} );
@@ -331,12 +328,9 @@ QUnit.module( "CLI Main", () => {
 			try {
 				await execute( command );
 			} catch ( e ) {
-				assert.equal( e.stdout, expectedOutput[ command ] );
-
-				// These are actually undesirable, but the verification help document
-				// current behavior. TDD should break these and correct them.
-				assert.equal( e.code, 7 );
-				assert.true( e.stderr.includes( "TypeError: Cannot read property 'length' of undefined" ), e.stderr );
+				assert.equal( e.code, 1 );
+				assert.equal( e.stderr, expectedOutput[ command ].stderr );
+				assert.equal( e.stdout, expectedOutput[ command ].stdout );
 			}
 		} );
 

@@ -14,7 +14,9 @@ function normalize( actual ) {
 	return String( actual )
 		.trimEnd()
 		.replace( reDir, "/qunit" )
-		.replace( /(\/qunit\/qunit\/qunit\.js):\d+:\d+\)/g, "$1)" )
+
+		// trim line numbers off of qunit.js frames
+		.replace( /(\/qunit\/qunit\/qunit\.js):\d+:\d+/g, "$1" )
 
 		// convert sourcemap'ed traces from Node 14 and earlier to the
 		// standard format used by Node 15+.
