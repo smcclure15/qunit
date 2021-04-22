@@ -98,17 +98,14 @@ ok 5 A-Test > derp
 	"qunit --reporter npm-reporter": "Run ended!",
 	"qunit --reporter does-not-exist": `No reporter found matching "does-not-exist".
 Built-in reporters: console, tap
-Extra reporters found among package dependencies: npm-reporter
-`,
+Extra reporters found among package dependencies: npm-reporter`,
 
 	"qunit --reporter": `Built-in reporters: console, tap
-Extra reporters found among package dependencies: npm-reporter
-`,
+Extra reporters found among package dependencies: npm-reporter`,
 
 	/* eslint-disable max-len */
 	"qunit hanging-test": `Error: Process exited before tests finished running
-Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.
-`,
+Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.`,
 	/* eslint-enable max-len */
 	"qunit unhandled-rejection.js":
 `TAP version 13
@@ -143,6 +140,27 @@ not ok 2 global failure
 # skip 0
 # todo 0
 # fail 2`,
+
+	"qunit error-in-begin-callback.js": {
+		"stdout": "TAP version 13",
+		"stderr": "Error: Process exited before tests finished running"
+	},
+
+	"qunit error-in-testDone-callback.js": {
+		"stdout":
+`TAP version 13
+ok 1 Test A`,
+		"stderr": "Error: Process exited before tests finished running"
+	},
+
+	"qunit error-in-done-callback.js":
+`TAP version 13
+ok 1 Test A
+1..1
+# pass 1
+# skip 0
+# todo 0
+# fail 0`,
 
 	// The last frame differs between Node 10 and 12+ (changes in processing of ticks)
 	"qunit no-tests":
@@ -340,5 +358,22 @@ ok 1 module providing hooks > module not providing hooks > has a test
 # pass 1
 # skip 0
 # todo 0
-# fail 0`
+# fail 0`,
+
+	"qunit done-after-timeout.js":
+`TAP version 13
+not ok 1 times out before scheduled done is called
+  ---
+  message: Test took longer than 10ms; test timed out.
+  severity: failed
+  actual  : null
+  expected: undefined
+  stack: |
+        at internal
+  ...
+1..1
+# pass 0
+# skip 0
+# todo 0
+# fail 1`
 };

@@ -11,7 +11,8 @@ function normalize( actual ) {
 	const dir = path.join( __dirname, "..", "..", ".." );
 	const reDir = new RegExp( dir.replace( reEscape, "\\$1" ), "g" );
 
-	return actual
+	return String( actual )
+		.trimEnd()
 		.replace( reDir, "/qunit" )
 		.replace( /(\/qunit\/qunit\/qunit\.js):\d+:\d+\)/g, "$1)" )
 
@@ -48,10 +49,12 @@ module.exports = async function execute( command, execaOptions, hook ) {
 
 	try {
 		const result = await execution;
-		result.stdout = normalize( String( result.stdout ).trimEnd() );
+		result.stdout = normalize( result.stdout );
+		result.stderr = normalize( result.stderr );
 		return result;
 	} catch ( e ) {
-		e.stdout = normalize( String( e.stdout ).trimEnd() );
+		e.stdout = normalize( e.stdout );
+		e.stderr = normalize( e.stderr );
 		throw e;
 	}
 };
