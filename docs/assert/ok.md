@@ -6,16 +6,16 @@ categories:
   - assert
 redirect_from:
   - "/ok/"
-version_added: "1.0"
+version_added: "1.0.0"
 ---
 
 `ok( state [, message ] )`
 
 A boolean check. Passes if the first argument is truthy.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `state`            | Expression being tested              |
+| name | description |
+|------|-------------|
+| `state` | Expression being tested |
 | `message` (string) | A short description of the assertion |
 
 ### Description

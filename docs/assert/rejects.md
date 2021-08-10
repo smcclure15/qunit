@@ -4,17 +4,17 @@ title: assert.rejects()
 excerpt: Test if the provided promise rejects.
 categories:
   - assert
-version_added: "2.5"
+version_added: "2.5.0"
 ---
 
 `rejects( promise[, expectedMatcher][, message ] )`
 
 Test if the provided promise rejects, and optionally compare the rejection value.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `promise` (thenable) | promise to test for rejection      |
-| `expectedMatcher`  | Rejection value matcher              |
+| name | description |
+|------|-------------|
+| `promise` (thenable) | promise to test for rejection |
+| `expectedMatcher` | Rejection value matcher |
 | `message` (string) | A short description of the assertion |
 
 
@@ -88,5 +88,34 @@ QUnit.test( "rejects example", assert => {
       return err.toString() === "some error";
     }
   );
+});
+```
+
+The `assert.rejects()` method returns a `Promise` which handles the (often asynchronous) resolution and rejection logic for test successes and failures. It is not required to `await` the returned value, since QUnit internally handles the async control for you and waits for a settled state. However, if your test code requires a consistent and more isolated state between `rejects` calls, then this should be explicitly awaited to hold back the next statements.
+
+```js
+QUnit.test( "stateful rejects example", async assert => {
+  let value;
+
+  // asynchronously resolve if value < 5, and reject otherwise
+  function asyncChecker() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (value < 5) {
+          resolve();
+        } else {
+          reject("bad value: " + value);
+        }
+      }, 10)
+    });
+  }
+
+  value = 8;
+  await assert.rejects( asyncChecker(), /bad value: 8/ );
+
+  // if the above was not awaited, then the next line would change the value
+  // before the previous assertion could occur, and would cause a test failure
+  value = Infinity;
+  await assert.rejects( asyncChecker(), /bad value: Infinity/ );
 });
 ```

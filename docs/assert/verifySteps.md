@@ -4,16 +4,16 @@ title: assert.verifySteps()
 excerpt: A helper assertion to verify the order and number of steps in a test.
 categories:
   - assert
-version_added: "2.2"
+version_added: "2.2.0"
 ---
 
 `verifySteps( steps [, message ] )`
 
 A helper assertion to verify the order and number of steps in a test.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `steps` (array)    | Array of strings representing steps to verify |
+| name | description |
+|------|-------------|
+| `steps` (array) | List of strings |
 | `message` (string) | A short description of the assertion |
 
 ### Description

@@ -4,17 +4,17 @@ title: assert.notOk()
 excerpt: Check if the first argument is falsy.
 categories:
   - assert
-version_added: "1.18"
+version_added: "1.18.0"
 ---
 
 `notOk( state [, message ] )`
 
 A boolean check, inverse of `ok()`. Passes if the first argument is falsy.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| state              | Expression being tested              |
-| message (string)   | A short description of the assertion |
+| name | description |
+|------|-------------|
+| state | Expression being tested |
+| message (string) | A short description of the assertion |
 
 ### Description
 

@@ -6,17 +6,17 @@ categories:
   - assert
 redirect_from:
   - "/notDeepEqual/"
-version_added: "1.0"
+version_added: "1.0.0"
 ---
 
 `notDeepEqual( actual, expected [, message ] )`
 
 An inverted deep recursive comparison, working on primitive types, arrays, objects, regular expressions, dates and functions.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `actual`           | Expression being tested              |
-| `expected`         | Known comparison value               |
+| name | description |
+|------|-------------|
+| `actual` | Expression being tested |
+| `expected` | Known comparison value |
 | `message` (string) | A short description of the assertion |
 
 ### Description

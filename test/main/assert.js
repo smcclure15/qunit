@@ -1,16 +1,11 @@
 function buildMockPromise( settledValue, shouldFulfill ) {
 
-	// Support IE 9: Promise not supported, test should not load polyfil globally to ensure
-	// QUnit works without it, so we create our own thenable with setTimeout.
-	// Support SpiderMonkey: setTimeout is not supported, re-use the IE 9 mock, but
-	// using SM's native Promise support for the deferred callback handling.
-	var defer = typeof setTimeout !== "undefined" ?
-		setTimeout :
-		function( fn ) {
-			Promise.resolve().then( fn );
-		};
+	// Support IE 9: Promise not supported, test MUST NOT load polyfil globally.
+	// Support SpiderMonkey: setTimeout is not supported, but native Promise is.
+	var defer = typeof setTimeout !== "undefined" ? setTimeout : function( fn ) {
+		Promise.resolve().then( fn );
+	};
 
-	// Return a mock self-fulfilling Promise ("thenable")
 	var thenable = {
 		then: function( fulfilledCallback, rejectedCallback ) {
 			defer( function() {
@@ -19,12 +14,10 @@ function buildMockPromise( settledValue, shouldFulfill ) {
 					rejectedCallback.call( thenable, settledValue );
 			} );
 
-			// returning another thennable for easy confirmation
-			// of return value
+			// returning another thenable for easy confirmation of return value
 			return buildMockPromise( "final promise", true );
 		}
 	};
-
 	return thenable;
 }
 
@@ -97,13 +90,6 @@ QUnit.test( "notStrictEqual", function( assert ) {
 } );
 
 QUnit.test( "propEqual", function( assert ) {
-	var objectCreate = Object.create || function( origin ) {
-		function O() {}
-		O.prototype = origin;
-		var r = new O();
-		return r;
-	};
-
 	function Foo( x, y, z ) {
 		this.x = x;
 		this.y = y;
@@ -115,7 +101,7 @@ QUnit.test( "propEqual", function( assert ) {
 
 	function Bar() {
 	}
-	Bar.prototype = objectCreate( Foo.prototype );
+	Bar.prototype = Object.create( Foo.prototype );
 	Bar.prototype.constructor = Bar;
 
 	assert.propEqual(
@@ -201,7 +187,7 @@ QUnit.test( "throws", function( assert ) {
 			"expected is a string",
 			"message is non-null"
 		);
-	}, /throws\/raises does not accept a string value for the expected argument/ );
+	}, /^Error: assert\.throws does not accept a string value for the expected argument/ );
 
 	// This test is for IE 7 and prior which does not properly
 	// implement Error.prototype.toString
@@ -305,6 +291,17 @@ QUnit.test( "throws", function( assert ) {
 
 	assert.throws(
 		function() {
+			throw {
+				name: true,
+				message: "some message"
+			};
+		},
+		/^true: some message$/,
+		"formatted string for Error object with non-string name property"
+	);
+
+	assert.throws(
+		function() {
 			throw {};
 		},
 		/^Error$/,
@@ -359,6 +356,60 @@ QUnit.test( "throws", function( assert ) {
 		},
 		/description/,
 		"throw error from property of 'this' context"
+	);
+
+	// the following are nested assertions, validating that it
+	// initially throws due to an invalid expected value
+
+	assert.throws(
+		function() {
+			assert.throws(
+				undefined, // irrelevant
+				2
+			);
+		},
+		/^Error: Invalid expected value type \(number\) provided to assert\.throws\.$/,
+		"throws errors when provided a number"
+	);
+
+	// note that "falsey" values are actually ok
+	assert.throws(
+		function() {
+			throw new this.CustomError( "some error description" );
+		},
+		0,
+		"throws passes when expected is falsey (0)"
+	);
+
+	assert.throws(
+		function() {
+			assert.throws(
+				undefined, // irrelevant
+				true
+			);
+		},
+		/^Error: Invalid expected value type \(boolean\) provided to assert\.throws\.$/,
+		"throws errors when provided a boolean"
+	);
+
+	// note that "falsey" values are actually ok
+	assert.throws(
+		function() {
+			throw new this.CustomError( "some error description" );
+		},
+		false,
+		"throws passes when expected is falsey (false)"
+	);
+
+	assert.throws(
+		function() {
+			assert.throws(
+				undefined, // irrelevant
+				[]
+			);
+		},
+		/^Error: Invalid expected value type \(array\) provided to assert\.throws\.$/,
+		"throws errors when provided an array"
 	);
 } );
 
@@ -479,16 +530,86 @@ QUnit.test( "rejects", function( assert ) {
 		buildMockPromise( undefined ),
 		"reject with undefined against no matcher"
 	);
+
+	// the following are nested assertions, validating that it
+	// initially throws due to an invalid expected value
+
+	assert.throws(
+		function() {
+			assert.rejects(
+				undefined, // irrelevant
+				2
+			);
+		},
+		/^Error: Invalid expected value type \(number\) provided to assert\.rejects\.$/,
+		"rejects errors when provided a number"
+	);
+
+	// note that "falsey" values are actually ok
+	assert.rejects(
+		buildMockPromise( undefined ),
+		0,
+		"rejects passes when expected is falsey (0)"
+	);
+
+	assert.throws(
+		function() {
+			assert.rejects(
+				undefined, // irrelevant
+				true
+			);
+		},
+		/^Error: Invalid expected value type \(boolean\) provided to assert\.rejects\.$/,
+		"rejects errors when provided a boolean"
+	);
+
+	// note that "falsey" values are actually ok
+	assert.rejects(
+		buildMockPromise( undefined ),
+		false,
+		"rejects passes when expected is falsey (false)"
+	);
+
+	assert.throws(
+		function() {
+			assert.rejects(
+				undefined, // irrelevant
+				[]
+			);
+		},
+		/^Error: Invalid expected value type \(array\) provided to assert\.rejects\.$/,
+		"rejects errors when provided an array"
+	);
+
+	assert.throws(
+		function() {
+			assert.rejects(
+				undefined, // irrelevant
+				"expected is a string",
+				"message is non-null"
+			);
+		},
+		/^Error: assert\.rejects does not accept a string value for the expected argument/,
+		"rejects errors when provided a string"
+	);
+
+	// should return a thenable
+	var returnValue = assert.rejects(
+		buildMockPromise( undefined )
+	);
+	assert.strictEqual( typeof returnValue, "object" );
+	assert.strictEqual( typeof returnValue.then, "function" );
+
 } );
 
-QUnit.module( "failing assertions", {
+QUnit.module( "assert - failing assertions", {
 	beforeEach: function( assert ) {
 		var originalPushResult = assert.pushResult;
 		assert.pushResult = function( resultInfo ) {
 
 			// Inverts the result so we can test failing assertions
 			resultInfo.result = !resultInfo.result;
-			originalPushResult( resultInfo );
+			originalPushResult.call( this, resultInfo );
 		};
 	}
 } );
@@ -610,6 +731,27 @@ QUnit.test( "throws", function( assert ) {
 		},
 		"throws fail when expected function returns false"
 	);
+
+	// non-function actual values
+	assert.throws(
+		undefined,
+		"throws fails when actual value is undefined" );
+
+	assert.throws(
+		2,
+		"throws fails when actual value is a number" );
+
+	assert.throws(
+		[],
+		"throws fails when actual value is an array" );
+
+	assert.throws(
+		"notafunction",
+		"throws fails when actual value is a string" );
+
+	assert.throws(
+		{},
+		"throws fails when actual value is an object" );
 } );
 
 QUnit.test( "rejects", function( assert ) {
@@ -645,28 +787,4 @@ QUnit.test( "rejects", function( assert ) {
 	);
 
 	assert.rejects( null );
-
-	assert.rejects(
-		buildMockPromise( "foo" ),
-		2,
-		"rejects fails when provided a number"
-	);
-
-	assert.rejects(
-		buildMockPromise( "foo" ),
-		"string matcher",
-		"rejects fails when provided a number"
-	);
-
-	assert.rejects(
-		buildMockPromise( "foo" ),
-		false,
-		"rejects fails when provided a boolean"
-	);
-
-	assert.rejects(
-		buildMockPromise( "foo" ),
-		[],
-		"rejects fails when provided an array"
-	);
 } );

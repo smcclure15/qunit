@@ -1,15 +1,18 @@
+// Support IE 9: Promise not supported, test MUST NOT load polyfil globally.
+// Support SpiderMonkey: setTimeout is not supported, but native Promise is.
+var defer = typeof setTimeout !== "undefined" ? setTimeout : function( fn ) {
+	Promise.resolve().then( fn );
+};
+
 // NOTE: Adds 1 assertion
 function createMockPromise( assert, reject, value ) {
 	if ( arguments.length < 3 ) {
 		value = {};
 	}
-
-	// Return a mock self-fulfilling Promise ("thenable")
 	var thenable = {
 		then: function( fulfilledCallback, rejectedCallback ) {
-			assert.strictEqual( this, thenable, "`then` was invoked with the Promise as the " +
-				"context" );
-			setTimeout( function() {
+			assert.strictEqual( this, thenable, "`then` invoked with our Promise as thisValue" );
+			defer( function() {
 				return reject ?
 					rejectedCallback.call( thenable, value ) :
 					fulfilledCallback.call( thenable, value );
@@ -150,10 +153,10 @@ QUnit.module( "Support for Promise", function() {
 		assert.expect( 2 );
 
 		var done = assert.async();
-		setTimeout( function() {
+		defer( function() {
 			assert.true( true );
 			done();
-		}, 100 );
+		} );
 
 		// Adds 1 assertion
 		return createMockPromise( assert );
@@ -201,19 +204,50 @@ QUnit.module( "Support for Promise", function() {
 		return createMockPromise( assert, true, "this is an error" );
 	} );
 
-	QUnit.test( "rejected Promise with async lock", function( assert ) {
+	QUnit.test( "rejected Promise with async pause", function( assert ) {
 		assert.expect( 2 );
 
-		assert.async(); // Important! We don't explicitly release the async lock
+		assert.async(); // Important! We don't explicitly release the async pause
 
 		this.pushFailure = assert.test.pushFailure;
 		assert.test.pushFailure = function( message ) {
 			assert.strictEqual(
 				message,
-				"Promise rejected during \"rejected Promise with async lock\": this is an error"
+				"Promise rejected during \"rejected Promise with async pause\": this is an error"
 			);
 		};
 
 		return createMockPromise( assert, true, "this is an error" );
+	} );
+
+	QUnit.module( "test.each()", {
+		afterEach: function( assert ) {
+
+			// Restore
+			if ( this.pushFailure ) {
+				assert.test.pushFailure = this.pushFailure;
+			}
+		}
+	} );
+
+	QUnit.test.each( "fulfilled Promise", [ 1 ], function( assert, _data ) {
+		assert.expect( 1 );
+
+		// Adds 1 assertion
+		return createMockPromise( assert );
+	} );
+
+	QUnit.test.each( "rejected Promise with Error", [ 1 ], function( assert, _data ) {
+		assert.expect( 2 );
+
+		this.pushFailure = assert.test.pushFailure;
+		assert.test.pushFailure = function( message ) {
+			assert.strictEqual(
+				message,
+				"Promise rejected during \"rejected Promise with Error [0]\": this is an error"
+			);
+		};
+
+		return createMockPromise( assert, true, new Error( "this is an error" ) );
 	} );
 } );

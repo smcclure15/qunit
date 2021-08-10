@@ -5,55 +5,69 @@ layout: page
 <section class="sidebar">
     <h4>Main methods</h4>
     <ul class="sidebar-list">
-    {% assign methods = site.pages | where:'categories', 'main' %}
-    {% for entry in methods %}
-    <li class="sidebar-item{% if entry.url == page.url %} sidebar-item-active{% endif %}">
-        <a href="{{ entry.url }}">{{entry.title}}</a>
+    {%- assign list = site.pages | where: 'categories', 'main' | sort_natural: 'title' -%}
+    {% for entry in list %}
+    <li class="sidebar-item{% if page.url == entry.url %} sidebar-item-active{% endif %}">
+        <a href="{{ entry.url }}">{{ entry.title }}</a>
     </li>
-    {% endfor %}
+    {%- endfor %}
     </ul>
 
     <h4>Assertions</h4>
     <ul class="sidebar-list">
-    {% assign assertions = site.pages | where:'categories', 'assert' %}
-    {% for entry in assertions %}
-    <li class="sidebar-item{% if entry.url == page.url %} sidebar-item-active{% endif %}">
-        <a href="{{ entry.url }}">{{entry.title}}</a>
+    {%- assign list = site.pages | where: 'categories', 'assert' | sort_natural: 'title' -%}
+    {% for entry in list %}
+    <li class="sidebar-item{% if page.url == entry.url %} sidebar-item-active{% endif %}">
+        <a href="{{ entry.url }}">{{ entry.title }}</a>
     </li>
-    {% endfor %}
-    </ul>
-
-    <h4>Configuration tools</h4>
-
-    <ul class="sidebar-list">
-    {% assign config = site.pages | where:'categories', 'config' %}
-    {% for entry in config %}
-    <li class="sidebar-item{% if entry.url == page.url %} sidebar-item-active{% endif %}">
-        <a href="{{ entry.url }}">{{entry.title}}</a>
-    </li>
-    {% endfor %}
+    {%- endfor %}
     </ul>
 
     <h4>Callback events</h4>
-
     <ul class="sidebar-list">
-    {% assign callbacks = site.pages | where:'categories', 'callbacks' %}
-    {% for entry in callbacks %}
-    <li class="sidebar-item{% if entry.url == page.url %} sidebar-item-active{% endif %}">
-        <a href="{{ entry.url }}">{{entry.title}}</a>
+    {%- assign list = site.pages | where: 'categories', 'callbacks' | sort_natural: 'title' -%}
+    {% for entry in list %}
+    <li class="sidebar-item{% if page.url == entry.url %} sidebar-item-active{% endif %}">
+        <a href="{{ entry.url }}">{{ entry.title }}</a>
     </li>
-    {% endfor %}
+    {%- endfor %}
     </ul>
 
     <h4>Async control</h4>
-
     <ul class="sidebar-list">
-    {% assign async = site.pages | where:'categories', 'async' %}
-    {% for entry in async %}
-    <li class="sidebar-item{% if entry.url == page.url %} sidebar-item-active{% endif %}">
-        <a href="{{ entry.url }}">{{entry.title}}</a>
+    {%- assign list = site.pages | where: 'categories', 'async' | sort_natural: 'title' -%}
+    {% for entry in list %}
+    <li class="sidebar-item{% if page.url == entry.url %} sidebar-item-active{% endif %}">
+        <a href="{{ entry.url }}">{{ entry.title }}</a>
     </li>
-    {% endfor %}
+    {%- endfor %}
+    </ul>
+
+    <h4>Configuration</h4>
+    <ul class="sidebar-list">
+    {%- assign index = site.pages | where: 'category', 'config' | first -%}
+    {%- assign list = site.pages | where: 'categories', 'config' | sort_natural: 'title' -%}
+    {%- assign self_in_list = list | where: 'url', page.url | size -%}
+    <li class="sidebar-item{% if page.url == index.url %} sidebar-item-active{% endif %}">
+        <a href="{{ index.url }}">{{index.title}}</a>
+    </li>
+    {% if page.url == index.url or self_in_list > 0 %}
+    {% for entry in list %}
+    <li class="sidebar-item{% if page.url == entry.url %} sidebar-item-active{% endif %}">
+        <a href="{{ entry.url }}">{{ entry.title }}</a>
+    </li>
+    {%- endfor %}
+    {%- endif %}
+    </ul>
+
+    <h4>Extension interface</h4>
+    <ul class="sidebar-list">
+    {%- assign list = site.pages | where: 'categories', 'extension' | sort_natural: 'title' -%}
+    {% for entry in list %}
+    <li class="sidebar-item{% if page.url == entry.url %} sidebar-item-active{% endif %}">
+        <a href="{{ entry.url }}">{{ entry.title }}</a>
+    </li>
+    {%- endfor %}
     </ul>
 
     <h4>Other</h4>
@@ -85,5 +99,5 @@ layout: page
         {{ lines | strip | newline_to_br }}
     </p>
     {%- endif %}
-    {{ content }}
+	{{- content }}
 </div>

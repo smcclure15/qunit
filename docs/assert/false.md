@@ -4,16 +4,16 @@ title: assert.false()
 excerpt: A strict boolean false comparison.
 categories:
   - assert
-version_added: "2.11"
+version_added: "2.11.0"
 ---
 
 `false( actual [, message ] )`
 
 A strict comparison that passes if the first argument is boolean `false`.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `actual`           | Expression being tested              |
+| name | description |
+|------|-------------|
+| `actual` | Expression being tested |
 | `message` (string) | A short description of the assertion |
 
 ### Description

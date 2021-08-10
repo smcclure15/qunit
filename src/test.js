@@ -3,6 +3,7 @@ import { begin } from "./core";
 import { setTimeout, clearTimeout } from "./globals";
 import { emit } from "./events";
 import Assert from "./assert";
+import Logger from "./logger";
 import Promise from "./promise";
 
 import config from "./core/config";
@@ -24,10 +25,13 @@ import TestReport from "./reports/test";
 export default function Test( settings ) {
 	this.expected = null;
 	this.assertions = [];
-	this.semaphore = 0;
 	this.module = config.currentModule;
 	this.steps = [];
 	this.timeout = undefined;
+	this.data = undefined;
+	this.withData = false;
+	this.pauses = new Map();
+	this.nextPauseId = 1;
 	extend( this, settings );
 
 	// If a module is skipped, all its tests and the tests of the child suites
@@ -46,6 +50,20 @@ export default function Test( settings ) {
 		this.todo = true;
 	}
 
+	// Queuing a late test after the run has ended is not allowed.
+	// This was once supported for internal use by QUnit.onError().
+	// Ref https://github.com/qunitjs/qunit/issues/1377
+	if ( ProcessingQueue.finished ) {
+
+		// Using this for anything other than onError(), such as testing in QUnit.done(),
+		// is unstable and will likely result in the added tests being ignored by CI.
+		// (Meaning the CI passes irregardless of the added tests).
+		//
+		// TODO: Make this an error in QUnit 3.0
+		// throw new Error( "Unexpected new test after the run already ended" );
+		Logger.warn( "Unexpected test after runEnd. This is unstable and will fail in QUnit 3.0." );
+		return;
+	}
 	if ( !this.skip && typeof this.callback !== "function" ) {
 		const method = this.todo ? "QUnit.todo" : "QUnit.test";
 		throw new TypeError( `You must provide a callback to ${method}("${this.testName}")` );
@@ -176,12 +194,17 @@ Test.prototype = {
 		}
 
 		function runTest( test ) {
-			const promise = test.callback.call( test.testEnvironment, test.assert );
+			let promise;
+			if ( test.withData ) {
+				promise = test.callback.call( test.testEnvironment, test.assert, test.data );
+			} else {
+				promise = test.callback.call( test.testEnvironment, test.assert );
+			}
 			test.resolvePromise( promise );
 
-			// If the test has a "lock" on it, but the timeout is 0, then we push a
+			// If the test has an async "pause" on it, but the timeout is 0, then we push a
 			// failure as the test should be synchronous.
-			if ( test.timeout === 0 && test.semaphore !== 0 ) {
+			if ( test.timeout === 0 && test.pauses.size > 0 ) {
 				pushFailure(
 					"Test did not finish synchronously even though assert.timeout( 0 ) was used.",
 					sourceFromStacktrace( 2 )
@@ -296,6 +319,13 @@ Test.prototype = {
 		module.stats.all += this.assertions.length;
 
 		for ( let i = 0; i < this.assertions.length; i++ ) {
+
+			// A failing assertion will counts toward the HTML Reporter's
+			// "X assertions, Y failed" line even if it was inside a todo.
+			// Inverting this would be similarly confusing since all but the last
+			// passing assertion inside a todo test should be considered as good.
+			// These stats don't decide the outcome of anything, so counting them
+			// as failing seems the most intuitive.
 			if ( !this.assertions[ i ].result ) {
 				bad++;
 				config.stats.bad++;
@@ -309,7 +339,9 @@ Test.prototype = {
 			incrementTestsRun( module );
 		}
 
-		// Store result when possible
+		// Store result when possible.
+		// Note that this also marks todo tests as bad, thus they get hoisted,
+		// and always run first on refresh.
 		if ( storage ) {
 			if ( bad ) {
 				storage.setItem( "qunit-test-" + moduleName + "-" + testName, bad );
@@ -436,11 +468,6 @@ Test.prototype = {
 		this.previousFailure = !!previousFailCount;
 
 		ProcessingQueue.add( runTest, prioritize, config.seed );
-
-		// If the queue has already finished, we manually process the new test
-		if ( ProcessingQueue.finished ) {
-			ProcessingQueue.advance();
-		}
 	},
 
 	pushResult: function( resultInfo ) {
@@ -676,63 +703,107 @@ function checkPollution() {
 
 let focused = false; // indicates that the "only" filter was used
 
-// Will be exposed as QUnit.test
-export function test( testName, callback ) {
+function addTest( settings ) {
 	if ( focused || config.currentModule.ignored ) {
 		return;
 	}
 
-	const newTest = new Test( {
-		testName: testName,
-		callback: callback
-	} );
+	const newTest = new Test( settings );
 
 	newTest.queue();
 }
 
+function addOnlyTest( settings ) {
+	if ( config.currentModule.ignored ) {
+		return;
+	}
+	if ( !focused ) {
+		config.queue.length = 0;
+		focused = true;
+	}
+
+	const newTest = new Test( settings );
+
+	newTest.queue();
+}
+
+// Will be exposed as QUnit.test
+export function test( testName, callback ) {
+	addTest( { testName, callback } );
+}
+
+function makeEachTestName( testName, argument ) {
+	return `${testName} [${argument}]`;
+}
+
+function runEach( data, eachFn ) {
+	if ( Array.isArray( data ) ) {
+		data.forEach( eachFn );
+	} else if ( typeof data === "object" && data !== null ) {
+		const keys = Object.keys( data );
+		keys.forEach( ( key ) => {
+			eachFn( data[ key ], key );
+		} );
+	} else {
+		throw new Error(
+			`test.each() expects an array or object as input, but
+found ${typeof data} instead.`
+		);
+	}
+}
+
 extend( test, {
-	todo: function todo( testName, callback ) {
-		if ( focused || config.currentModule.ignored ) {
-			return;
-		}
-
-		const newTest = new Test( {
-			testName,
-			callback,
-			todo: true
-		} );
-
-		newTest.queue();
+	todo: function( testName, callback ) {
+		addTest( { testName, callback, todo: true } );
 	},
-	skip: function skip( testName ) {
-		if ( focused || config.currentModule.ignored ) {
-			return;
-		}
-
-		const test = new Test( {
-			testName: testName,
-			skip: true
-		} );
-
-		test.queue();
+	skip: function( testName ) {
+		addTest( { testName, skip: true } );
 	},
-	only: function only( testName, callback ) {
-		if ( config.currentModule.ignored ) {
-			return;
-		}
-		if ( !focused ) {
-			config.queue.length = 0;
-			focused = true;
-		}
-
-		const newTest = new Test( {
-			testName: testName,
-			callback: callback
+	only: function( testName, callback ) {
+		addOnlyTest( { testName, callback } );
+	},
+	each: function( testName, dataset, callback ) {
+		runEach( dataset, ( data, testKey ) => {
+			addTest( {
+				testName: makeEachTestName( testName, testKey ),
+				callback,
+				withData: true,
+				data
+			} );
 		} );
-
-		newTest.queue();
 	}
 } );
+
+test.todo.each = function( testName, dataset, callback ) {
+	runEach( dataset, ( data, testKey ) => {
+		addTest( {
+			testName: makeEachTestName( testName, testKey ),
+			callback,
+			todo: true,
+			withData: true,
+			data
+		} );
+	} );
+};
+test.skip.each = function( testName, dataset ) {
+	runEach( dataset, ( _, testKey ) => {
+		addTest( {
+			testName: makeEachTestName( testName, testKey ),
+			skip: true
+		} );
+	} );
+};
+
+test.only.each = function( testName, dataset, callback ) {
+	runEach( dataset, ( data, testKey ) => {
+		addOnlyTest( {
+			testName: makeEachTestName( testName, testKey ),
+			callback,
+			withData: true,
+			data
+		} );
+	} );
+};
 
 // Resets config.timeout with a new timeout duration.
 export function resetTestTimeout( timeoutDuration ) {
@@ -740,16 +811,100 @@ export function resetTestTimeout( timeoutDuration ) {
 	config.timeout = setTimeout( config.timeoutHandler( timeoutDuration ), timeoutDuration );
 }
 
-// Put a hold on processing and return a function that will release it.
-export function internalStop( test ) {
-	let released = false;
-	test.semaphore += 1;
+// Create a new async pause and return a new function that can release the pause.
+//
+// This mechanism is internally used by:
+//
+// * explicit async pauses, created by calling `assert.async()`,
+// * implicit async pauses, created when `QUnit.test()` or module hook callbacks
+//   use async-await or otherwise return a Promise.
+//
+// Happy scenario:
+//
+// * Pause is created by calling internalStop().
+//
+//   Pause is released normally by invoking release() during the same test.
+//
+//   The release() callback lets internal processing resume.
+//
+// Failure scenarios:
+//
+// * The test fails due to an uncaught exception.
+//
+//   In this case, Test.run() will call internalRecover() which empties the clears all
+//   async pauses and sets the cancelled flag, which means we silently ignore any
+//   late calls to the resume() callback, as we will have moved on to a different
+//   test by then, and we don't want to cause an extra "release during a different test"
+//   errors that the developer isn't really responsible for. This can happen when a test
+//   correctly schedules a call to release(), but also causes an uncaught error. The
+//   uncaught error means we will no longer wait for the release (as it might not arrive).
+//
+// * Pause is never released, or called an insufficient number of times.
+//
+//   Our timeout handler will kill the pause and resume test processing, basically
+//   like internalRecover(), but for one pause instead of any/all.
+//
+//   Here, too, any late calls to resume() will be silently ignored to avoid
+//   extra errors. We tolerate this since the original test will have already been
+//   marked as failure.
+//
+//   TODO: QUnit 3 will enable timeouts by default <https://github.com/qunitjs/qunit/issues/1483>,
+//   but right now a test will hang indefinitely if async pauses are not released,
+//   unless QUnit.config.testTimeout or assert.timeout() is used.
+//
+// * Pause is spontaneously released during a different test,
+//   or when no test is currently running.
+//
+//   This is close to impossible because this error only happens if the original test
+//   succesfully finished first (since other failure scenarios kill pauses and ignore
+//   late calls). It can happen if a test ended exactly as expected, but has some
+//   external or shared state continuing to hold a reference to the release callback,
+//   and either the same test scheduled another call to it in the future, or a later test
+//   causes it to be called through some shared state.
+//
+// * Pause release() is called too often, during the same test.
+//
+//   This simply throws an error, after which uncaught error handling picks it up
+//   and processing resumes.
+export function internalStop( test, requiredCalls = 1 ) {
 	config.blocking = true;
+
+	const pauseId = test.nextPauseId++;
+	const pause = {
+		cancelled: false,
+		remaining: requiredCalls
+	};
+	test.pauses.set( pauseId, pause );
+
+	function release() {
+		if ( pause.cancelled ) {
+			return;
+		}
+		if ( config.current === undefined ) {
+			throw new Error( "Unexpected release of async pause after tests finished.\n" +
+				`> Test: ${test.testName} [async #${pauseId}]` );
+		}
+		if ( config.current !== test ) {
+			throw new Error( "Unexpected release of async pause during a different test.\n" +
+				`> Test: ${test.testName} [async #${pauseId}]` );
+		}
+		if ( pause.remaining <= 0 ) {
+			throw new Error( "Tried to release async pause that was already released.\n" +
+				`> Test: ${test.testName} [async #${pauseId}]` );
+		}
+
+		// The `requiredCalls` parameter exists to support `assert.async(count)`
+		pause.remaining--;
+		if ( pause.remaining === 0 ) {
+			test.pauses.delete( pauseId );
+		}
+
+		internalStart( test );
+	}
 
 	// Set a recovery timeout, if so configured.
 	if ( setTimeout ) {
 		let timeoutDuration;
-
 		if ( typeof test.timeout === "number" ) {
 			timeoutDuration = test.timeout;
 		} else if ( typeof config.testTimeout === "number" ) {
@@ -760,12 +915,14 @@ export function internalStop( test ) {
 			config.timeoutHandler = function( timeout ) {
 				return function() {
 					config.timeout = null;
-					pushFailure(
+					pause.cancelled = true;
+					test.pauses.delete( pauseId );
+
+					test.pushFailure(
 						`Test took longer than ${timeout}ms; test timed out.`,
 						sourceFromStacktrace( 2 )
 					);
-					released = true;
-					internalRecover( test );
+					internalStart( test );
 				};
 			};
 			clearTimeout( config.timeout );
@@ -776,56 +933,31 @@ export function internalStop( test ) {
 		}
 	}
 
-	return function resume() {
-		if ( released ) {
-			return;
-		}
-
-		released = true;
-		test.semaphore -= 1;
-		internalStart( test );
-	};
+	return release;
 }
 
 // Forcefully release all processing holds.
 function internalRecover( test ) {
-	test.semaphore = 0;
+	test.pauses.forEach( pause => {
+		pause.cancelled = true;
+	} );
+	test.pauses.clear();
 	internalStart( test );
 }
 
 // Release a processing hold, scheduling a resumption attempt if no holds remain.
 function internalStart( test ) {
 
-	// If semaphore is non-numeric, throw error
-	if ( isNaN( test.semaphore ) ) {
-		test.semaphore = 0;
-
-		pushFailure(
-			"Invalid value on test.semaphore",
-			sourceFromStacktrace( 2 )
-		);
-	}
-
-	// Don't start until equal number of stop-calls
-	if ( test.semaphore > 0 ) {
+	// Ignore if other async pauses still exist.
+	if ( test.pauses.size > 0 ) {
 		return;
-	}
-
-	// Throw an Error if start is called more often than stop
-	if ( test.semaphore < 0 ) {
-		test.semaphore = 0;
-
-		pushFailure(
-			"Tried to restart test while already started (test's semaphore was 0 already)",
-			sourceFromStacktrace( 2 )
-		);
 	}
 
 	// Add a slight delay to allow more assertions etc.
 	if ( setTimeout ) {
 		clearTimeout( config.timeout );
 		config.timeout = setTimeout( function() {
-			if ( test.semaphore > 0 ) {
+			if ( test.pauses.size > 0 ) {
 				return;
 			}
 

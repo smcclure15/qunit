@@ -43,7 +43,7 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     env:
-      PUPPETEER_DOWNLOAD_PATH: ~/.puppeteer_download
+      PUPPETEER_DOWNLOAD_PATH: "${{ github.workspace }}/.puppeteer_download"
     steps:
       - uses: actions/checkout@v2
 
@@ -52,7 +52,7 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/.puppeteer_download
+            ${{ github.workspace }}/.puppeteer_download
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Use Node.js ${{ matrix.node }}
@@ -65,18 +65,35 @@ jobs:
       - name: Tests
         run: ${{ matrix.script }}
 
+  # To reproduce SpiderMonkey builds locally:
+  #
+  # 1. Run the build the same way you normally do.
+  #    ```
+  #    nobody@nodejs-isolated:/qunit$ npm run build
+  #    ```
+  # 2. Start a temporary Docker container using the official Ubuntu image from DockerHub,
+  #    and mount the current working directory in it:
+  #    ```
+  #    you@host:/qunit$ MNT=$(basename "$PWD"); docker run --rm --interactive --tty --mount type=bind,source="$PWD",target="/$MNT",readonly --entrypoint /bin/sh ubuntu:focal -c "cd /$MNT;bash"
+  #    ```
+  # 3. Run the following from the Docker container's bash prompt:
+  #    ```
+  #    root@ubuntu-tmp/qunit$ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y libmozjs-68-dev
+  #    root@ubuntu-tmp/qunit$ js68 test/mozjs.js
+  #    ```
+  #
   sm-test:
     name: SpiderMonkey
     runs-on: ubuntu-20.04
     env:
-      PUPPETEER_DOWNLOAD_PATH: ~/.puppeteer_download
+      PUPPETEER_DOWNLOAD_PATH: "${{ github.workspace }}/.puppeteer_download"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
         with:
           path: |
             ~/.npm
-            ~/.puppeteer_download
+            ${{ github.workspace }}/.puppeteer_download
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Use Node.js 10
         uses: actions/setup-node@v2

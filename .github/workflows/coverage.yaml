@@ -5,9 +5,10 @@ on:
 jobs:
   run:
     name: Code coverage
+    if: ${{ github.repository == 'qunitjs/qunit' }} # skip on forks, needs secret
     runs-on: ubuntu-20.04
     env:
-      PUPPETEER_DOWNLOAD_PATH: ~/.puppeteer_download
+      PUPPETEER_DOWNLOAD_PATH: "${{ github.workspace }}/.puppeteer_download"
     steps:
       - uses: actions/checkout@v2
 
@@ -15,13 +16,13 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/.puppeteer_download
+            ${{ github.workspace }}/.puppeteer_download
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Use Node.js 10
+      - name: Use Node.js 14
         uses: actions/setup-node@v2
         with:
-          node-version: 10.x
+          node-version: 14.x
 
       - run: npm ci
 
@@ -32,3 +33,5 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: "${{ secrets.COVERALLS_REPO_TOKEN }}"
           COVERALLS_GIT_BRANCH: "${{ github.ref }}"
+          COVERALLS_SERVICE_NAME: github-actions
+          COVERALLS_SERVICE_JOB_ID: "${{ github.run_id }}"

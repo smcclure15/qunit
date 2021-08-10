@@ -61,7 +61,7 @@ not ok 1 Throws match > bad
   actual  : Error: Match me with a pattern
   expected: "/incorrect pattern/"
   stack: |
-        at Object.<anonymous> (/qunit/test/cli/fixtures/fail/throws-match.js:3:10)
+        at /qunit/test/cli/fixtures/fail/throws-match.js:3:10
   ...
 1..1
 # pass 0
@@ -98,45 +98,39 @@ ok 5 A-Test > derp
 	"qunit --reporter npm-reporter": "Run ended!",
 	"qunit --reporter does-not-exist": `No reporter found matching "does-not-exist".
 Built-in reporters: console, tap
-Extra reporters found among package dependencies: npm-reporter
-`,
+Extra reporters found among package dependencies: npm-reporter`,
 
 	"qunit --reporter": `Built-in reporters: console, tap
-Extra reporters found among package dependencies: npm-reporter
-`,
+Extra reporters found among package dependencies: npm-reporter`,
 
-	/* eslint-disable max-len */
 	"qunit hanging-test": `Error: Process exited before tests finished running
-Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.
-`,
+Last test to run (hanging) has an async hold. Ensure all assert.async() callbacks are invoked and Promises resolve. You should also set a standard timeout via QUnit.config.testTimeout.`,
 	/* eslint-enable max-len */
 	"qunit unhandled-rejection.js":
-`TAP version 13
-not ok 1 Unhandled Rejections > test passes just fine, but has a rejected promise
+`not ok 1 global failure
   ---
-  message: Error thrown in non-returned promise!
+  message: Error: outside of a test context
   severity: failed
-  actual  : {
-  "message": "Error thrown in non-returned promise!",
-  "stack": "Error: Error thrown in non-returned promise!\\n    at /some/path/wherever/unhandled-rejection.js:13:11"
-}
+  stack: |
+    Error: outside of a test context
+        at /qunit/test/cli/fixtures/unhandled-rejection.js:17:18
+        at processModule (/qunit/qunit/qunit.js)
+        at Object.module$1 [as module] (/qunit/qunit/qunit.js)
+        at /qunit/test/cli/fixtures/unhandled-rejection.js:3:7
+        at internal
+  ...
+Bail out! Error: outside of a test context
+TAP version 13
+not ok 2 Unhandled Rejections > test passes just fine, but has a rejected promise
+  ---
+  message: global failure: Error: Error thrown in non-returned promise!
+  severity: failed
+  actual  : undefined
   expected: undefined
   stack: |
     Error: Error thrown in non-returned promise!
-        at /some/path/wherever/unhandled-rejection.js:13:11
-  ...
-not ok 2 global failure
-  ---
-  message: outside of a test context
-  severity: failed
-  actual  : {
-  "message": "outside of a test context",
-  "stack": "Error: outside of a test context\\n    at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)"
-}
-  expected: undefined
-  stack: |
-    Error: outside of a test context
-        at Object.<anonymous> (/some/path/wherever/unhandled-rejection.js:20:18)
+        at /qunit/test/cli/fixtures/unhandled-rejection.js:10:10
+        at internal
   ...
 1..2
 # pass 0
@@ -149,10 +143,8 @@ not ok 2 global failure
 `TAP version 13
 not ok 1 global failure
   ---
-  message: No tests were run.
+  message: Error: No tests were run.
   severity: failed
-  actual  : {}
-  expected: undefined
   stack: |
     Error: No tests were run.
         at done (/qunit/qunit/qunit.js)
@@ -161,6 +153,7 @@ not ok 1 global failure
         at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
         at internal
   ...
+Bail out! Error: No tests were run.
 1..1
 # pass 0
 # skip 0
@@ -177,7 +170,7 @@ not ok 2 Example > bad
   actual  : false
   expected: true
   stack: |
-        at Object.<anonymous> (/qunit/test/cli/fixtures/sourcemap/source.js:7:14)
+        at /qunit/test/cli/fixtures/sourcemap/source.js:7:14
   ...
 1..2
 # pass 1
@@ -195,7 +188,7 @@ not ok 2 Example > bad
   actual  : false
   expected: true
   stack: |
-        at Object.<anonymous> (/qunit/test/cli/fixtures/sourcemap/sourcemap/source.js:7:10)
+        at /qunit/test/cli/fixtures/sourcemap/sourcemap/source.js:7:10
   ...
 1..2
 # pass 1
@@ -243,10 +236,8 @@ ok 1 Zero assertions > has a test
 `TAP version 13
 not ok 1 global failure
   ---
-  message: "No tests matched the filter \\"no matches\\"."
+  message: "Error: No tests matched the filter \\"no matches\\"."
   severity: failed
-  actual  : {}
-  expected: undefined
   stack: |
     Error: No tests matched the filter "no matches".
         at done (/qunit/qunit/qunit.js)
@@ -255,6 +246,7 @@ not ok 1 global failure
         at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
         at internal
   ...
+Bail out! Error: No tests matched the filter "no matches".
 1..1
 # pass 0
 # skip 0
@@ -301,7 +293,7 @@ not ok 1 # TODO module B > Only this module should run > a todo test
   actual  : false
   expected: true
   stack: |
-        at Object.<anonymous> (/qunit/test/cli/fixtures/only/module.js:17:15)
+        at /qunit/test/cli/fixtures/only/module.js:17:15
   ...
 ok 2 # SKIP module B > Only this module should run > implicitly skipped test
 ok 3 module B > Only this module should run > normal test
@@ -323,7 +315,7 @@ not ok 1 # TODO module B > test B
   actual  : false
   expected: true
   stack: |
-        at Object.<anonymous> (/qunit/test/cli/fixtures/only/module-flat.js:9:13)
+        at /qunit/test/cli/fixtures/only/module-flat.js:9:13
   ...
 ok 2 # SKIP module B > test C
 ok 3 module B > test D
@@ -336,6 +328,24 @@ ok 3 module B > test D
 	"qunit incorrect-hooks-warning/test.js":
 `TAP version 13
 ok 1 module providing hooks > module not providing hooks > has a test
+1..1
+# pass 1
+# skip 0
+# todo 0
+# fail 0`,
+
+	"qunit async-module-warning/test.js":
+`TAP version 13
+ok 1 resulting parent module > has a test
+1..1
+# pass 1
+# skip 0
+# todo 0
+# fail 0`,
+
+	"qunit async-module-warning/promise-test.js":
+`TAP version 13
+ok 1 module manually returning a promise > has a test
 1..1
 # pass 1
 # skip 0
@@ -368,6 +378,39 @@ not ok 1 slow
 # todo 0
 # fail 1`,
 
+	"qunit bad-callbacks/begin-throw.js":
+`TAP version 13
+not ok 1 global failure
+  ---
+  message: Error: No dice
+  severity: failed
+  stack: |
+    Error: No dice
+        at /qunit/test/cli/fixtures/bad-callbacks/begin-throw.js:2:8
+        at /qunit/qunit/qunit.js
+        at internal
+  ...
+Bail out! Error: No dice`,
+
+	"qunit bad-callbacks/done-throw.js":
+`TAP version 13
+ok 1 module1 > test1
+1..1
+# pass 1
+# skip 0
+# todo 0
+# fail 0
+Bail out! Error: No dice
+  ---
+  message: Error: No dice
+  severity: failed
+  stack: |
+    Error: No dice
+        at /qunit/test/cli/fixtures/bad-callbacks/done-throw.js:2:8
+        at /qunit/qunit/qunit.js
+        at internal
+  ...`,
+
 	"qunit done-after-timeout.js":
 `TAP version 13
 not ok 1 times out before scheduled done is called
@@ -383,5 +426,94 @@ not ok 1 times out before scheduled done is called
 # pass 0
 # skip 0
 # todo 0
-# fail 1`
+# fail 1`,
+
+	"qunit drooling-done.js":
+`TAP version 13
+not ok 1 Test A
+  ---
+  message: "Died on test #2     at Object.test (/qunit/qunit/qunit.js): this is an intentional error"
+  severity: failed
+  actual  : null
+  expected: undefined
+  stack: |
+    Error: this is an intentional error
+        at /qunit/test/cli/fixtures/drooling-done.js:8:8
+  ...
+ok 2 Test B
+1..2
+# pass 1
+# skip 0
+# todo 0
+# fail 1`,
+
+	"qunit drooling-extra-done.js":
+`TAP version 13
+ok 1 Test A
+not ok 2 Test B
+  ---
+  message: |+
+    Died on test #2     at Object.test (/qunit/qunit/qunit.js): Unexpected release of async pause during a different test.
+    > Test: Test A [async #1]
+  severity: failed
+  actual  : null
+  expected: undefined
+  stack: |
+    Error: Unexpected release of async pause during a different test.
+    > Test: Test A [async #1]
+  ...
+1..2
+# pass 1
+# skip 0
+# todo 0
+# fail 1`,
+
+	"qunit drooling-extra-done-outside.js":
+`TAP version 13
+ok 1 extra done scheduled outside any test
+1..1
+# pass 1
+# skip 0
+# todo 0
+# fail 0
+Bail out! Error: Unexpected release of async pause after tests finished.
+  ---
+  message: |+
+    Error: Unexpected release of async pause after tests finished.
+    > Test: extra done scheduled outside any test [async #1]
+  severity: failed
+  stack: |
+    Error: Unexpected release of async pause after tests finished.
+    > Test: extra done scheduled outside any test [async #1]
+        at Timeout.release [as _onTimeout] (/qunit/qunit/qunit.js)
+        at internal
+  ...`,
+
+	"qunit too-many-done-calls.js":
+`TAP version 13
+not ok 1 Test A
+  ---
+  message: |+
+    Died on test #2     at Object.test (/qunit/qunit/qunit.js): Tried to release async pause that was already released.
+    > Test: Test A [async #1]
+  severity: failed
+  actual  : null
+  expected: undefined
+  stack: |
+    Error: Tried to release async pause that was already released.
+    > Test: Test A [async #1]
+  ...
+1..1
+# pass 0
+# skip 0
+# todo 0
+# fail 1`,
+
+	"qunit assert-expect/no-tests.js":
+`TAP version 13
+1..0
+# pass 0
+# skip 0
+# todo 0
+# fail 0`
 };

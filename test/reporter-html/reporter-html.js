@@ -46,7 +46,7 @@ QUnit.module( "HTML Reporter", function() {
 	QUnit.test( "run progress", function( assert ) {
 		var display = document.getElementById( "qunit-testresult" );
 
-		var expected = /\d+ \/ \d+ tests completed in \d+ milliseconds, with \d+ failed, \d+ skipped, and \d+ todo./;
+		var expected = /\d+ \/ \d+ tests completed/;
 		assert.true(
 			expected.test( display.innerHTML ),
 			"progress found in displayed text"
@@ -122,6 +122,7 @@ QUnit.module( "HTML Reporter", function() {
 
 		// Verify QUnit supported stack trace
 		if ( !err.stack ) {
+			// eslint-disable-next-line qunit/no-conditional-assertions
 			assert.false(
 				/(^| )qunit-source( |$)/.test( source.className ),
 				"Don't add source information on unsupported environments"

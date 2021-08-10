@@ -7,6 +7,7 @@ import Assert from "./assert";
 import Logger from "./logger";
 import Test, { test, pushFailure } from "./test";
 import exportQUnit from "./export";
+import reporters from "./reporters";
 
 import config from "./core/config";
 import { extend, objectType, is, now } from "./core/utilities";
@@ -17,8 +18,8 @@ import ProcessingQueue from "./core/processing-queue";
 import SuiteReport from "./reports/suite";
 
 import { on, emit } from "./events";
-import onError from "./core/onerror";
-import onUnhandledRejection from "./core/on-unhandled-rejection";
+import onWindowError from "./core/onerror";
+import onUncaughtException from "./core/on-uncaught-exception";
 
 const QUnit = {};
 export const globalSuite = new SuiteReport();
@@ -42,11 +43,12 @@ extend( QUnit, {
 
 	dump,
 	equiv,
+	reporters,
 	is,
 	objectType,
 	on,
-	onError,
-	onUnhandledRejection,
+	onError: onWindowError,
+	onUncaughtException,
 	pushFailure,
 
 	assert: Assert.prototype,
@@ -97,6 +99,12 @@ extend( QUnit, {
 
 	},
 
+	onUnhandledRejection: function( reason ) {
+		Logger.warn( "QUnit.onUnhandledRejection is deprecated and will be removed in QUnit 3.0." +
+			" Please use QUnit.onUncaughtException instead." );
+		onUncaughtException( reason );
+	},
+
 	extend: function( ...args ) {
 		Logger.warn( "QUnit.extend is deprecated and will be removed in QUnit 3.0." +
 			" Please use Object.assign instead." );
@@ -110,7 +118,6 @@ extend( QUnit, {
 
 		// Initialize the configuration options
 		extend( config, {
-			stats: { all: 0, bad: 0, testCount: 0 },
 			started: 0,
 			updateRate: 1000,
 			autostart: true,

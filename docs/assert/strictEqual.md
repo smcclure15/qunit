@@ -8,17 +8,17 @@ redirect_from:
   - "/same/"
   - "/strictEqual/"
   - "/assert/same/"
-version_added: "1.0"
+version_added: "1.0.0"
 ---
 
 `strictEqual( actual, expected [, message ] )`
 
 A strict type and value comparison.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `actual`           | Expression being tested              |
-| `expected`         | Known comparison value               |
+| name | description |
+|------|-------------|
+| `actual` | Expression being tested |
+| `expected` | Known comparison value |
 | `message` (string) | A short description of the assertion |
 
 ### Description

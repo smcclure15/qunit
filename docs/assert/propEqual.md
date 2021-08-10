@@ -6,17 +6,17 @@ categories:
   - assert
 redirect_from:
   - "/propEqual/"
-version_added: "1.11"
+version_added: "1.11.0"
 ---
 
 `propEqual( actual, expected [, message ] )`
 
 A strict type and value comparison of an object's own properties.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `actual`           | Expression being tested              |
-| `expected`         | Known comparison value               |
+| name | description |
+|------|-------------|
+| `actual` | Expression being tested |
+| `expected` | Known comparison value |
 | `message` (string) | A short description of the assertion |
 
 ### Description

@@ -6,17 +6,17 @@ categories:
   - assert
 redirect_from:
   - "/notStrictEqual/"
-version_added: "1.0"
+version_added: "1.0.0"
 ---
 
 `notStrictEqual( actual, expected [, message ] )`
 
 A strict comparison, checking for inequality.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `actual`           | Expression being tested              |
-| `expected`         | Known comparison value               |
+| name | description |
+|------|-------------|
+| `actual` | Expression being tested |
+| `expected` | Known comparison value |
 | `message` (string) | A short description of the assertion |
 
 ### Description

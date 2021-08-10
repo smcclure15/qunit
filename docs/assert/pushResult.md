@@ -4,15 +4,15 @@ title: assert.pushResult()
 excerpt: Report the result of a custom assertion.
 categories:
   - assert
-version_added: "1.22"
+version_added: "1.22.0"
 ---
 
 `pushResult( data )`
 
 Report the result of a custom assertion.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
+| name | description |
+|------|-------------|
 | `data.result` (boolean) | Result of the assertion |
 | `data.actual` | Expression being tested |
 | `data.expected` | Known comparison value |

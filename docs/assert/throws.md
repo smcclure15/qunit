@@ -7,7 +7,7 @@ categories:
 redirect_from:
   - "/assert/raises/"
   - "/throws/"
-version_added: "1.0"
+version_added: "1.0.0"
 ---
 
 `throws( blockFn[, expectedMatcher][, message ] )`<br>
@@ -15,10 +15,10 @@ version_added: "1.0"
 
 Test if a callback throws an exception, and optionally compare the thrown error.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `blockFn` (function) | Function to execute                |
-| `expectedMatcher`  | Expected error matcher               |
+| name | description |
+|------|-------------|
+| `blockFn` (function) | Function to execute |
+| `expectedMatcher` | Expected error matcher |
 | `message` (string) | A short description of the assertion |
 
 

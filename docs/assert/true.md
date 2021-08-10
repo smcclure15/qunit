@@ -4,16 +4,16 @@ title: assert.true()
 excerpt: A strict boolean true comparison.
 categories:
   - assert
-version_added: "2.11"
+version_added: "2.11.0"
 ---
 
 `true( actual [, message ] )`
 
 A strict comparison that passes if the first argument is boolean `true`.
 
-| name               | description                          |
-|--------------------|--------------------------------------|
-| `actual`           | Expression being tested              |
+| name | description |
+|------|-------------|
+| `actual` | Expression being tested |
 | `message` (string) | A short description of the assertion |
 
 ### Description

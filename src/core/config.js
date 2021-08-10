@@ -11,8 +11,14 @@ const config = {
 	// The queue of tests to run
 	queue: [],
 
+	stats: { all: 0, bad: 0, testCount: 0 },
+
 	// Block until document ready
 	blocking: true,
+
+	// whether or not to fail when there are zero tests
+	// defaults to `true`
+	failOnZeroTests: true,
 
 	// By default, run previously failed tests first
 	// very useful in combination with "Hide passed tests" checked
