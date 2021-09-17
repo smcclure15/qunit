@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.testId
 excerpt: Select one or more tests to run, by their internal ID (HTML Reporter).
-categories:
+groups:
   - config
 version_added: "1.16.0"
 ---
 
 In the HTML Reporter, select one or more tests to run by their internal ID.
 
-### Description
+## Description
 
 <table>
 <tr>
@@ -27,5 +27,5 @@ In the HTML Reporter, select one or more tests to run by their internal ID.
 This property allows QUnit to run specific tests by their internally hashed identifier. You can specify one or multiple tests to run. This option powers the "Rerun" button in the HTML Reporter.
 
 See also:
-* [QUnit.config.test](./test.md)
-* [QUnit.config.module](./module.md)
+* [QUnit.config.filter](./filter.md)
+* [QUnit.config.moduleId](./moduleId.md)

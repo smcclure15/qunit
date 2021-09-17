@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.storage
 excerpt: The Storage object to use for remembering failed tests between runs.
-categories:
+groups:
   - config
 version_added: "2.1.0"
 ---
 
 The Storage object to use for remembering failed tests between runs.
 
-### Description
+## Description
 
 <table>
 <tr>

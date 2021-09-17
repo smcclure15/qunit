@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.fixture
 excerpt: HTML content to render in the fixture container at the start of each test (HTML Reporter).
-categories:
+groups:
   - config
 version_added: "1.0.0"
 ---
 
 In the HTML Reporter, this HTML content will be rendered in the fixture container at the start of each test.
 
-### Description
+## Description
 
 <table>
 <tr>

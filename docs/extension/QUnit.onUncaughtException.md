@@ -1,10 +1,10 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.onUncaughtException()
 excerpt: Handle a global error.
-categories:
+groups:
  - extension
-version_added: "unreleased"
+version_added: "2.17.0"
 redirect_from:
   - "/config/QUnit.onUncaughtException/"
 ---
@@ -17,7 +17,7 @@ Handle a global error that should result in a failed test run.
 |------|-------------|
 | `error` (any) | Usually an `Error` object, but any other thrown or rejected value may be given as well. |
 
-### Examples
+## Examples
 
 ```js
 const error = new Error( "Failed to reverse the polarity of the neutron flow" );

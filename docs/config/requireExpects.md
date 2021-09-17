@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.requireExpects
 excerpt: Fail tests that don't specify how many assertions they expect.
-categories:
+groups:
   - config
 version_added: "1.7.0"
 ---
 
 Fail tests that don't specify how many assertions they expect.
 
-### Description
+## Description
 
 <table>
 <tr>

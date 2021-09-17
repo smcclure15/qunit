@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.maxDepth
 excerpt: The depth up-to which an object will be serialized during a diff (HTML Reporter).
-categories:
+groups:
   - config
 version_added: "1.16.0"
 ---
 
 In the HTML Reporter, the depth up-to which an object will be serialized during the diff of an assertion failure.
 
-### Description
+## Description
 
 <table>
 <tr>

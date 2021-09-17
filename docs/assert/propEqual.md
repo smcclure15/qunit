@@ -1,8 +1,8 @@
 ---
-layout: default
+layout: page-api
 title: assert.propEqual()
 excerpt: A strict type and value comparison of an object's own properties.
-categories:
+groups:
   - assert
 redirect_from:
   - "/propEqual/"
@@ -19,7 +19,7 @@ A strict type and value comparison of an object's own properties.
 | `expected` | Known comparison value |
 | `message` (string) | A short description of the assertion |
 
-### Description
+## Description
 
 The `propEqual()` assertion provides strictly (`===`) comparison of Object properties. Unlike `deepEqual()`, this assertion can be used to compare two objects made with different constructors and prototype.
 
@@ -27,7 +27,7 @@ The `propEqual()` assertion provides strictly (`===`) comparison of Object prope
 
 [`notPropEqual()`](./notPropEqual.md) can be used to explicitly test strict inequality of Object properties.
 
-### Examples
+## Examples
 
 Compare the properties values of two objects.
 

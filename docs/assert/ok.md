@@ -1,8 +1,8 @@
 ---
-layout: default
+layout: page-api
 title: assert.ok()
 excerpt: Check if the first argument is truthy.
-categories:
+groups:
   - assert
 redirect_from:
   - "/ok/"
@@ -18,11 +18,11 @@ A boolean check. Passes if the first argument is truthy.
 | `state` | Expression being tested |
 | `message` (string) | A short description of the assertion |
 
-### Description
+## Description
 
 The most basic assertion in QUnit, `ok()` requires just one argument. If the argument evaluates to true, the assertion passes; otherwise, it fails. If a second message argument is provided, it will be displayed in place of the result.
 
-### Examples
+## Examples
 
 ```js
 QUnit.test( "example", assert => {

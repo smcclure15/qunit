@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.notrycatch
 excerpt: Disable handling of uncaught exceptions during tests.
-categories:
+groups:
   - config
 version_added: "1.0.0"
 ---
 
 Disable handling of uncaught exceptions during tests.
 
-### Description
+## Description
 
 <table>
 <tr>

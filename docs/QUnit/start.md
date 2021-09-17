@@ -1,8 +1,8 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.start()
 excerpt: Start an async test suite.
-categories:
+groups:
   - main
   - async
 redirect_from:
@@ -16,7 +16,7 @@ version_added: "1.0.0"
 
 When your async test has multiple exit points, call `QUnit.start()` for the corresponding number of `QUnit.stop()` increments.
 
-### Examples
+## Examples
 
 A test run that does not begin when the page is done loading. This example uses an Asynchronous Module Definition (AMD) loader-style `require` call.
 

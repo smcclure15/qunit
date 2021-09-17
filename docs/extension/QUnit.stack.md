@@ -1,8 +1,8 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.stack()
 excerpt: Return a single line string representing the stacktrace.
-categories:
+groups:
 - extension
 redirect_from:
   - "/config/QUnit.stack/"
@@ -25,7 +25,7 @@ Not all [browsers support retrieving stracktraces][browsers]. In those, `QUnit.s
 
 [browsers]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Stack#Browser_compatibility
 
-### Examples
+## Examples
 
 The stacktrace line can be used on custom assertions and reporters. The following example [logs](../callbacks/QUnit.log.md) the line of each passing assertion.
 

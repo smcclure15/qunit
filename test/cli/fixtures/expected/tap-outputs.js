@@ -143,8 +143,10 @@ not ok 2 Unhandled Rejections > test passes just fine, but has a rejected promis
 `TAP version 13
 not ok 1 global failure
   ---
-  message: Error: No tests were run.
+  message: No tests were run.
   severity: failed
+  actual  : undefined
+  expected: undefined
   stack: |
     Error: No tests were run.
         at done (/qunit/qunit/qunit.js)
@@ -153,7 +155,6 @@ not ok 1 global failure
         at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
         at internal
   ...
-Bail out! Error: No tests were run.
 1..1
 # pass 0
 # skip 0
@@ -236,8 +237,10 @@ ok 1 Zero assertions > has a test
 `TAP version 13
 not ok 1 global failure
   ---
-  message: "Error: No tests matched the filter \\"no matches\\"."
+  message: "No tests matched the filter \\"no matches\\"."
   severity: failed
+  actual  : undefined
+  expected: undefined
   stack: |
     Error: No tests matched the filter "no matches".
         at done (/qunit/qunit/qunit.js)
@@ -246,7 +249,6 @@ not ok 1 global failure
         at unblockAndAdvanceQueue (/qunit/qunit/qunit.js)
         at internal
   ...
-Bail out! Error: No tests matched the filter "no matches".
 1..1
 # pass 0
 # skip 0
@@ -265,6 +267,17 @@ ok 1 Single > has a test
 # fail 0`,
 
 	"node --expose-gc ../../../bin/qunit.js memory-leak/*.js":
+`TAP version 13
+ok 1 some nested module > can call method on foo
+ok 2 some nested module > child module > child test
+ok 3 later thing > has released all foos
+1..3
+# pass 3
+# skip 0
+# todo 0
+# fail 0`,
+
+	"node --expose-gc ../../../bin/qunit.js --filter '!child' memory-leak/*.js":
 `TAP version 13
 ok 1 some nested module > can call method on foo
 ok 2 later thing > has released all foos
@@ -323,6 +336,16 @@ ok 3 module B > test D
 # pass 2
 # skip 1
 # todo 1
+# fail 0`,
+
+	"qunit module-nested.js":
+`TAP version 13
+ok 1 module 1 > test in module 1
+ok 2 module 3 > test in module 3
+1..2
+# pass 2
+# skip 0
+# todo 0
 # fail 0`,
 
 	"qunit incorrect-hooks-warning/test.js":

@@ -1,8 +1,8 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.begin()
 excerpt: Register a callback to fire whenever the test suite begins.
-categories:
+groups:
   - callbacks
 redirect_from:
   - "/QUnit.begin/"
@@ -19,7 +19,7 @@ The callback will be called once, before QUnit runs any tests.
 |-----------|-------------|
 | callback (function) | Callback to execute. Provides a single argument with the callback Details object |
 
-##### Details object
+### Details object
 
 Passed to the callback:
 
@@ -27,7 +27,7 @@ Passed to the callback:
 |-----------|-------------|
 | `totalTests` | The number of total tests in the test suite |
 
-### Examples
+## Examples
 
 Get total number of tests known at the start.
 

@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.moduleId
 excerpt: Select one or more modules to run, by their internal ID (HTML Reporter).
-categories:
+groups:
   - config
 version_added: "1.23.0"
 ---
 
 In the HTML Reporter, select one or more modules to run by their internal ID.
 
-### Description
+## Description
 
 <table>
 <tr>
@@ -27,5 +27,5 @@ In the HTML Reporter, select one or more modules to run by their internal ID.
 Specify modules by their internally hashed identifier for a given module. You can specify one or multiple modules to run. This option powers the multi-select dropdown menu in the HTML Reporter.
 
 See also:
-* [QUnit.config.test](./test.md)
 * [QUnit.config.module](./module.md)
+* [QUnit.config.testId](./testId.md)

@@ -61,7 +61,7 @@ function processModule( name, options, executeNow, modifiers = {} ) {
 		options = undefined;
 	}
 
-	let module = createModule( name, options, modifiers );
+	const module = createModule( name, options, modifiers );
 
 	// Move any hooks to a 'hooks' object
 	const testEnvironment = module.testEnvironment;
@@ -79,23 +79,29 @@ function processModule( name, options, executeNow, modifiers = {} ) {
 		after: setHookFunction( module, "after" )
 	};
 
-	const currentModule = config.currentModule;
+	const prevModule = config.currentModule;
+	config.currentModule = module;
+
 	if ( objectType( executeNow ) === "function" ) {
 		moduleStack.push( module );
-		config.currentModule = module;
 
-		const cbReturnValue = executeNow.call( module.testEnvironment, moduleFns );
-		if ( cbReturnValue != null && objectType( cbReturnValue.then ) === "function" ) {
-			Logger.warn( "Returning a promise from a module callback is not supported. " +
-				"Instead, use hooks for async behavior. " +
-				"This will become an error in QUnit 3.0." );
+		try {
+			const cbReturnValue = executeNow.call( module.testEnvironment, moduleFns );
+			if ( cbReturnValue != null && objectType( cbReturnValue.then ) === "function" ) {
+				Logger.warn( "Returning a promise from a module callback is not supported. " +
+					"Instead, use hooks for async behavior. " +
+					"This will become an error in QUnit 3.0." );
+			}
+		} finally {
+
+			// If the module closure threw an uncaught error during the load phase,
+			// we let this bubble up to global error handlers. But, not until after
+			// we teardown internal state to ensure correct module nesting.
+			// Ref https://github.com/qunitjs/qunit/issues/1478.
+			moduleStack.pop();
+			config.currentModule = module.parentModule || prevModule;
 		}
-
-		moduleStack.pop();
-		module = module.parentModule || currentModule;
 	}
-
-	config.currentModule = module;
 
 	function setHookFromEnvironment( hooks, environment, name ) {
 		const potentialHook = environment[ name ];
@@ -106,8 +112,10 @@ function processModule( name, options, executeNow, modifiers = {} ) {
 	function setHookFunction( module, hookName ) {
 		return function setHook( callback ) {
 			if ( config.currentModule !== module ) {
-				Logger.warn( "The `" + hookName + "` hook was called inside the wrong module. " +
-					"Instead, use hooks provided by the callback to the containing module. " +
+				Logger.warn( "The `" + hookName + "` hook was called inside the wrong module (`" +
+					config.currentModule.name + "`). " +
+					"Instead, use hooks provided by the callback to the containing module (`" +
+					module.name + "`). " +
 					"This will become an error in QUnit 3.0." );
 			}
 			module.hooks[ hookName ].push( callback );

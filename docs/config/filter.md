@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.filter
 excerpt: Decide which tests should run based on a substring or pattern match.
-categories:
+groups:
   - config
 version_added: "1.0.0"
 ---
 
 Decide selectively which tests should run based on a substring or pattern match.
 
-### Description
+## Description
 
 <table>
 <tr>
@@ -30,10 +30,12 @@ You can also match via a regular expression by setting the filter to a regular e
 
 While substring filters are always **case-insensitive**, a regular expression is only insensitive when passing the `/i` flag.
 
+See also:
+* [QUnit.config.module](./module.md)
 
-### Examples
+## Examples
 
-#### Example: Substring filter
+### Example: Substring filter
 
 The below matches `QUnit.module( "FooBar" )` and `QUnit.test( "createFooBar" )`.
 
@@ -47,7 +49,7 @@ As inverted filter, the below would skip `QUnit.module( "FooBar" )` and `QUnit.t
 QUnit.config.filter = '!foo';
 ```
 
-#### Example: Regular expression filter
+### Example: Regular expression filter
 
 The below would match `QUnit.test( "foo" )`, but not `QUnit.test( "Foo" )`.
 

@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.seed
 excerpt: Enable randomized ordering of tests.
-categories:
+groups:
   - config
 version_added: "1.23.0"
 ---
 
 Enable randomized ordering of tests.
 
-### Description
+## Description
 
 <table>
 <tr>

@@ -76,6 +76,13 @@ export default function Test( settings ) {
 
 	++Test.count;
 	this.errorForStack = new Error();
+	if ( this.callback && this.callback.validTest ) {
+
+		// Omit the test-level trace for the internal "No tests" test failure,
+		// There is already an assertion-level trace, and that's noisy enough
+		// as it is.
+		this.errorForStack.stack = undefined;
+	}
 	this.testReport = new TestReport( this.testName, this.module.suiteReport, {
 		todo: this.todo,
 		skip: this.skip,
@@ -398,8 +405,20 @@ Test.prototype = {
 		function logSuiteEnd( module ) {
 
 			// Reset `module.hooks` to ensure that anything referenced in these hooks
-			// has been released to be garbage collected.
-			module.hooks = {};
+			// has been released to be garbage collected. Descendant modules that were
+			// entirely skipped, e.g. due to filtering, will never have this method
+			// called for them, but might have hooks with references pinning data in
+			// memory (even if the hooks weren't actually executed), so we reset the
+			// hooks on all descendant modules here as well. This is safe because we
+			// will never call this as long as any descendant modules still have tests
+			// to run. This also means that in multi-tiered nesting scenarios we might
+			// reset the hooks multiple times on some modules, but that's harmless.
+			const modules = [ module ];
+			while ( modules.length ) {
+				const nextModule = modules.shift();
+				nextModule.hooks = {};
+				modules.push( ...nextModule.childModules );
+			}
 
 			emit( "suiteEnd", module.suiteReport.end( true ) );
 			return runLoggingCallbacks( "moduleDone", {

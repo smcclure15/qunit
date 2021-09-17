@@ -1,15 +1,15 @@
 ---
-layout: default
+layout: page-api
 title: QUnit.config.failOnZeroTests
 excerpt: Fail the test run if no tests were run.
-categories:
+groups:
   - config
 version_added: "2.16.0"
 ---
 
 Whether to fail the test run if no tests were run.
 
-### Description
+## Description
 
 <table>
 <tr>
