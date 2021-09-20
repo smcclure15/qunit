@@ -529,8 +529,53 @@ CALLBACK: done`;
 		} );
 	} );
 
+	QUnit.test( "config.filter (string)", async assert => {
+		const command = "qunit config-filter-string.js";
+		const execution = await execute( command );
+
+		assert.equal( execution.code, 0 );
+		assert.equal( execution.stderr, "" );
+		assert.equal( execution.stdout, expectedOutput[ command ] );
+	} );
+
+	QUnit.test( "config.filter (regex)", async assert => {
+		const command = "qunit config-filter-regex.js";
+		const execution = await execute( command );
+
+		assert.equal( execution.code, 0 );
+		assert.equal( execution.stderr, "" );
+		assert.equal( execution.stdout, expectedOutput[ command ] );
+	} );
+
+	QUnit.test( "config.filter (regex exclude)", async assert => {
+		const command = "qunit config-filter-regex-exclude.js";
+		const execution = await execute( command );
+
+		assert.equal( execution.code, 0 );
+		assert.equal( execution.stderr, "" );
+		assert.equal( execution.stdout, expectedOutput[ command ] );
+	} );
+
 	QUnit.test( "config.module", async assert => {
 		const command = "qunit config-module.js";
+		const execution = await execute( command );
+
+		assert.equal( execution.code, 0 );
+		assert.equal( execution.stderr, "" );
+		assert.equal( execution.stdout, expectedOutput[ command ] );
+	} );
+
+	QUnit.test( "config.moduleId", async assert => {
+		const command = "qunit config-moduleId.js";
+		const execution = await execute( command );
+
+		assert.equal( execution.code, 0 );
+		assert.equal( execution.stderr, "" );
+		assert.equal( execution.stdout, expectedOutput[ command ] );
+	} );
+
+	QUnit.test( "config.testId", async assert => {
+		const command = "qunit config-testId.js";
 		const execution = await execute( command );
 
 		assert.equal( execution.code, 0 );
@@ -648,6 +693,16 @@ CALLBACK: done`;
 		QUnit.test( "nested modules", async assert => {
 
 			const command = "qunit only/module.js";
+			const execution = await execute( command );
+
+			assert.equal( execution.code, 0 );
+			assert.equal( execution.stderr, "" );
+			assert.equal( execution.stdout, expectedOutput[ command ] );
+		} );
+
+		QUnit.test( "module followed by test", async assert => {
+
+			const command = "qunit only/module-then-test.js";
 			const execution = await execute( command );
 
 			assert.equal( execution.code, 0 );

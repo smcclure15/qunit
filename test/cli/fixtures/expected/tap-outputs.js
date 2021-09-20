@@ -319,6 +319,16 @@ ok 6 module E > test E
 # todo 1
 # fail 0`,
 
+	"qunit only/module-then-test.js":
+`TAP version 13
+ok 1 module A > module B > test B
+1..2
+# pass 2
+# skip 0
+# todo 0
+# fail 0`,
+
+
 	"qunit only/module-flat.js":
 `TAP version 13
 not ok 1 # TODO module B > test B
@@ -375,11 +385,67 @@ ok 1 module manually returning a promise > has a test
 # todo 0
 # fail 0`,
 
+	"qunit config-filter-string.js":
+`TAP version 13
+ok 1 filter > foo test
+ok 2 filter > bar test
+1..2
+# pass 2
+# skip 0
+# todo 0
+# fail 0`,
+
+	"qunit config-filter-regex.js":
+`TAP version 13
+ok 1 filter > foo test
+ok 2 filter > FOO test
+ok 3 filter > bar test
+1..3
+# pass 3
+# skip 0
+# todo 0
+# fail 0`,
+
+	"qunit config-filter-regex-exclude.js":
+`TAP version 13
+ok 1 filter > foo test
+ok 2 filter > Bar test
+1..2
+# pass 2
+# skip 0
+# todo 0
+# fail 0`,
+
 	"qunit config-module.js":
 `TAP version 13
 ok 1 Module B > Test B
 1..1
 # pass 1
+# skip 0
+# todo 0
+# fail 0`,
+
+	"qunit config-moduleId.js":
+`TAP version 13
+ok 1 module A scoped > module C nested > test C1
+ok 2 module D scoped > test D1
+ok 3 module D scoped > module E nested > test E1
+ok 4 module D scoped > test D2
+ok 5 module F flat > test F1
+1..5
+# pass 5
+# skip 0
+# todo 0
+# fail 0`,
+
+	"qunit config-testId.js":
+`TAP version 13
+ok 1 test 2
+ok 2 module A > module B > test 1
+ok 3 module A > module C > test 2
+ok 4 module D > test 1
+1..0
+# pass 0
 # skip 0
 # todo 0
 # fail 0`,
